@@ -2,4 +2,12 @@
 title: "About"
 ---
 
-About this site
+## The UDOH Monoclonal Antibody Risk Calculator: An Analysis
+
+I am John Menzies, a data enthusiast with a passion for uncovering insights through exploratory data analysis. You can find more about my work on my [Github account](https://github.com/jamenzies) or reach out to me through my personal website: [johnmenzi.es](https://johnmenzi.es).
+
+This project focuses on analyzing the data behind Utah's Department of Health's race-based model for allocating monoclonal antibodies during the COVID-19 pandemic. The analysis is based on data obtained through Freedom of Information requests and is available on the project's Github repository.  The github repo for this project is located [here](https://github.com/jamenzies/utah-mab-eda).
+
+This project was created as a part of [Kane’s Data Science Bootcamp](https://bootcamp.davidkane.info/).
+
+
