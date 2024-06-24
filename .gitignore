@@ -6,4 +6,35 @@
 *Rproj
 *_file
 
+
+# RStudio specific
+.Rproj.user/
+.Ruserdata
+.Rhistory
+.RData
+.RDataTmp
+
+# Quarto specific
+_site/
+*.qmd~ 
+*.html 
+*.pdf
+*.docx
+
+# Quarto config
+.quarto/
+
+# Temporary files
+*~
+*.tmp
+*.temp
+
+# Logs and databases
+*.log
+*.sqlite
+
+# System files
+.DS_Store
+Thumbs.db
+
 /.quarto/
