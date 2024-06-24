@@ -2,36 +2,85 @@
   {
     "objectID": "utah-mab-eda.html",
     "href": "utah-mab-eda.html",
-    "title": "Utah Monoclonal Antibody Data: EDA",
+    "title": "Utah MaB Replication",
     "section": "",
-    "text": "Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see https://quarto.org."
+    "text": "Sunday, Jun 16, 2024 at 11:31 AM— title: “Utah Monoclonal Antibody Data: EDA” author: “John Menzies” format: html"
   },
   {
     "objectID": "utah-mab-eda.html#quarto",
     "href": "utah-mab-eda.html#quarto",
-    "title": "Utah Monoclonal Antibody Data: EDA",
-    "section": "",
-    "text": "Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see https://quarto.org."
+    "title": "Utah MaB Replication",
+    "section": "Quarto",
+    "text": "Quarto\nQuarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see https://quarto.org."
   },
   {
     "objectID": "utah-mab-eda.html#running-code",
     "href": "utah-mab-eda.html#running-code",
-    "title": "Utah Monoclonal Antibody Data: EDA",
+    "title": "Utah MaB Replication",
     "section": "Running Code",
     "text": "Running Code\nWhen you click the Render button a document will be generated that includes both content and the output of embedded code. You can embed code like this:\n\n1 + 1\n\n[1] 2\n\n\nYou can add options to executable code like this\n\n\n[1] 4\n\n\nThe echo: false option disables the printing of code (only output is displayed)."
   },
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "utah-mab-eda",
+    "title": "Replication of Utah MaB study",
     "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
+    "text": "In 2022, Tucker Carlson, a popular cable news host, highlighted a controversial COVID-19 policy in Utah:\n“In Utah, COVID patients are triaged by a scoring system [for antibody treatments]…]. [R]ace often counts more than physical health. The State of Utah, for example, gives two points simply for not being white [while] congestive heart failure earns one point.”\nThe Utah Department of Health faced criticism for their race-based triage system, which prioritized non-White patients for monoclonal antibodies.\nI obtained the underlying data to determine if UDOH’s results replicate."
   },
   {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this site"
+    "text": "I am John Menzies, a data enthusiast with a passion for uncovering insights through exploratory data analysis. You can find more about my work on my Github account or reach out to me through my personal website: johnmenzi.es.\nThis project focuses on analyzing the data behind Utah’s Department of Health’s race-based model for allocating monoclonal antibodies during the COVID-19 pandemic. The analysis is based on data obtained through Freedom of Information requests and is available on the project’s Github repository. The github repo for this project is located here.\nThis project was created as a part of Kane’s Data Science Bootcamp."
+  },
+  {
+    "objectID": "about.html#the-udoh-monoclonal-antibody-risk-calculator-an-analysis",
+    "href": "about.html#the-udoh-monoclonal-antibody-risk-calculator-an-analysis",
+    "title": "About",
+    "section": "",
+    "text": "I am John Menzies, a data enthusiast with a passion for uncovering insights through exploratory data analysis. You can find more about my work on my Github account or reach out to me through my personal website: johnmenzi.es.\nThis project focuses on analyzing the data behind Utah’s Department of Health’s race-based model for allocating monoclonal antibodies during the COVID-19 pandemic. The analysis is based on data obtained through Freedom of Information requests and is available on the project’s Github repository. The github repo for this project is located here.\nThis project was created as a part of Kane’s Data Science Bootcamp."
+  },
+  {
+    "objectID": "sources.html",
+    "href": "sources.html",
+    "title": "Sources",
+    "section": "",
+    "text": "The data for this project comes from the study “Simple scoring tool to estimate risk of hospitalization and mortality in ambulatory and emergency department patients with COVID-19” published in PLOS ONE. The dataset includes various patient-level attributes such as demographics, symptoms, and comorbidities, which were used to develop and validate the monoclonal antibody risk calculator during the COVID-19 pandemic. The original study and dataset can be accessed here."
+  },
+  {
+    "objectID": "sources.html#quarto",
+    "href": "sources.html#quarto",
+    "title": "Sources",
+    "section": "",
+    "text": "Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see https://quarto.org."
+  },
+  {
+    "objectID": "sources.html#running-code",
+    "href": "sources.html#running-code",
+    "title": "Sources",
+    "section": "Running Code",
+    "text": "Running Code\nWhen you click the Render button a document will be generated that includes both content and the output of embedded code. You can embed code like this:\n\n1 + 1\n\n[1] 2\n\n\nYou can add options to executable code like this\n\n\n[1] 4\n\n\nThe echo: false option disables the printing of code (only output is displayed)."
+  },
+  {
+    "objectID": "sources.html#data-sources",
+    "href": "sources.html#data-sources",
+    "title": "Sources",
+    "section": "",
+    "text": "The data for this project comes from the study “Simple scoring tool to estimate risk of hospitalization and mortality in ambulatory and emergency department patients with COVID-19” published in PLOS ONE. The dataset includes various patient-level attributes such as demographics, symptoms, and comorbidities, which were used to develop and validate the monoclonal antibody risk calculator during the COVID-19 pandemic. The original study and dataset can be accessed here."
+  },
+  {
+    "objectID": "sources.html#data-cleaning",
+    "href": "sources.html#data-cleaning",
+    "title": "Sources",
+    "section": "Data Cleaning",
+    "text": "Data Cleaning\nUpon receiving the dataset, I undertook several steps to clean and prepare it for analysis:\n\nMissing Values: I identified and handled missing values appropriately, either by imputing them based on other available data or by removing records with significant amounts of missing information.\nConversion of Variables: Certain columns such as sex, race, and ethnicity were converted into categorical variables to facilitate analysis. This involved transforming these text-based columns into factors.\nDummy Variables: For the purpose of regression analysis and other statistical methods, I created dummy variables for categorical columns (sex, race, ethnicity) using one-hot encoding."
+  },
+  {
+    "objectID": "sources.html#data-filtering",
+    "href": "sources.html#data-filtering",
+    "title": "Sources",
+    "section": "Data Filtering",
+    "text": "Data Filtering\nTo ensure the integrity and relevance of the analysis, certain observations were filtered out:\n\nIncomplete Records: Any records with missing critical information, such as age, sex, or key health indicators, were removed to prevent biases in the analysis.\nOutliers: Observations with extreme outliers in continuous variables (e.g., age, risk scores) were examined and removed if they were deemed to be data entry errors or not representative of the general population.\n\nThese steps ensured that the dataset was in a clean and usable state, ready for exploratory data analysis and further statistical examination. The cleaned and processed data forms the foundation of the insights and conclusions presented on this website."
   }
 ]

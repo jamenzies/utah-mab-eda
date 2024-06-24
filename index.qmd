@@ -1,5 +1,140 @@
 ---
 title: "Replication of Utah MaB study"
+execute: 
+  echo: false
 ---
+In 2022, Tucker Carlson, a popular cable news host, highlighted a controversial COVID-19 policy in Utah:
 
-This page is where the replication will take place
+"In Utah, COVID patients are triaged by a scoring system [for antibody treatments]...]. [R]ace often counts more than physical health. The State of Utah, for example, gives two points simply for not being white [while] congestive heart failure earns one point."
+
+The Utah Department of Health faced criticism for their race-based triage system, which prioritized non-White patients for monoclonal antibodies.
+
+I obtained the underlying data to determine if UDOH's results replicate.
+
+
+
+```{r}
+#| label: setup
+#| message: false
+
+library(tidyverse)
+library(janitor)
+
+```
+
+
+```{r}
+#| label: data-load
+#| message: false
+
+df <- read_csv("./data/pone.0261508.s001.csv")
+
+
+
+
+
+df <- df |> 
+  clean_names()
+
+
+df <- df %>%
+  mutate(
+    sex = as.factor(sex),
+    race = as.factor(race),
+    ethnicity = as.factor(ethnicity)
+  )
+
+
+df <- df %>% 
+        filter(sex == "Female" | sex == "Male") 
+
+df$race <- ifelse(is.na(df$race), "Unknown", as.character(df$race))
+df$ethnicity <- ifelse(is.na(df$ethnicity), "Unknown", as.character(df$ethnicity))
+
+
+
+df <- cbind(df,model.matrix(~ sex - 1, data = df))
+df <- cbind(df,model.matrix(~ race - 1, data = df))
+df <- cbind(df,model.matrix(~ ethnicity - 1, data = df))
+
+
+
+
+df <- df %>%
+  clean_names()
+
+df$white_nh <- ifelse(df$race == "White" & df$ethnicity == "Not Hispanic, Latino, or Spanish Origin", 1, 0)
+
+df$coc <- ifelse(df$race_black_or_african_american == 1 | df$race_asian ==1 | df$race_american_indian_or_alaska_native == 1 | df$race_multiple == 1 | df$race_native_hawaiian_or_pacific_islander == 1 | df$ethnicity_hispanic_latino_or_spanish_origin == 1, 1, 0)
+
+
+df <- df %>%
+  clean_names()
+
+
+
+```
+
+
+```{r}
+df %>% 
+        count(age, race, obesity) %>% 
+        group_by(age, race) %>% 
+        filter(race != "Multiple") %>% 
+        mutate(freq = n / sum(n)) %>% 
+        mutate(race = as.factor(race)) %>% 
+        filter(obesity == 1) %>% 
+        ggplot(aes(x=age,y=freq, color = race)) +
+        geom_point(alpha = .2) +
+        geom_smooth(method = "loess", formula = "y ~ x", se = FALSE) +
+        ggtitle("Obesity rates by race (excluding Multiple) and age")
+```
+
+```{r}
+
+# 
+# # data %>% 
+# #         count(age, coc, x28_d_mortality) %>% 
+# #         group_by(age, coc) %>% 
+# #         mutate(freq = n / sum(n)) %>% 
+# #         mutate(coc = as.factor(coc)) %>% 
+# #         filter(x28_d_mortality == 1) %>% 
+# #         ggplot(aes(x=age,y=freq, color = coc)) +
+# #         geom_point() +
+# #         geom_smooth(method = "loess") +
+# #         ggtitle("Death is quite rare")
+# 
+# # create an empty list to store the plots
+# plot_list2 <- list()
+# 
+# data$sex_male<-as.factor(data$sex_male)
+# # loop through each variable and create the plot
+# for (var in vars_to_plot) {
+#   p <- data %>%
+#     count(!!sym(var), age, hospitalized_14_days, .drop = FALSE) %>%
+#     group_by(!!sym(var), age) %>%
+#     mutate(freq = n / sum(n)) %>% 
+#     filter(hospitalized_14_days == 1) %>% 
+#     ggplot(aes(x=age,y=freq, color = !!sym(var))) +
+#         geom_point(size = .1) +
+#         geom_smooth(method = "loess")+
+#         ggtitle(var)+
+#         ylim(0,1)+
+#         theme(text = element_text(size = 6), axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(), panel.spacing = unit(0.1, "lines"), legend.position = "none")
+#   # add the plot to the list
+#   plot_list2[[var]] <- p
+# }
+# data$sex_male<-as.numeric(data$sex_male)
+# # create the facet wrap plot
+# 
+# ggarrange(plotlist = plot_list2, ncol=6, nrow = 4, common.legend = TRUE, legend="bottom") %>% 
+# annotate_figure(., top = textGrob("Hospitalization rates by comorbidity and age"))
+```
+
+
+
+
+
+
+
+

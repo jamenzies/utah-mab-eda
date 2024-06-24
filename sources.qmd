@@ -1,0 +1,27 @@
+---
+title: "Sources"
+---
+
+## Data Sources
+
+The data for this project comes from the study "Simple scoring tool to estimate risk of hospitalization and mortality in ambulatory and emergency department patients with COVID-19" published in PLOS ONE. The dataset includes various patient-level attributes such as demographics, symptoms, and comorbidities, which were used to develop and validate the monoclonal antibody risk calculator during the COVID-19 pandemic. The original study and dataset can be accessed [here](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0261508).
+
+## Data Cleaning
+
+Upon receiving the dataset, I undertook several steps to clean and prepare it for analysis:
+
+1. **Missing Values:** I identified and handled missing values appropriately, either by imputing them based on other available data or by removing records with significant amounts of missing information.
+
+2. **Conversion of Variables:** Certain columns such as `sex`, `race`, and `ethnicity` were converted into categorical variables to facilitate analysis. This involved transforming these text-based columns into factors.
+
+3. **Dummy Variables:** For the purpose of regression analysis and other statistical methods, I created dummy variables for categorical columns (`sex`, `race`, `ethnicity`) using one-hot encoding.
+
+## Data Filtering
+
+To ensure the integrity and relevance of the analysis, certain observations were filtered out:
+
+1. **Incomplete Records:** Any records with missing critical information, such as `age`, `sex`, or key health indicators, were removed to prevent biases in the analysis.
+
+2. **Outliers:** Observations with extreme outliers in continuous variables (e.g., age, risk scores) were examined and removed if they were deemed to be data entry errors or not representative of the general population.
+
+These steps ensured that the dataset was in a clean and usable state, ready for exploratory data analysis and further statistical examination. The cleaned and processed data forms the foundation of the insights and conclusions presented on this website.
