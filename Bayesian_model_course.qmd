@@ -1,0 +1,2275 @@
+---
+title: "Race-based medical allocation"
+author: "John Menzies"
+format: html
+editor: visual
+---
+
+# The UDOH MAb Risk Calculator: An outside-in post mortem
+
+*For most of the COVID-19 pandemic, I lived and worked in Utah. While there, the state's Department of Health (UDOH) implemented a race-based model to triage Monoclonal Antibodies. I suspected something was wrong with the statistical analysis based on inconsistencies in their public statements.*
+
+*After several months (and an appeal to the Director of UDOH), I received access to some of the information UDOH used to create their race-based calculator. Unfortunately, most of the critical information still remains shielded from public access because the analysis was performed by physicians at Intermountain (a private provider). It is possible that it will be published at some future date.*
+
+*All the information I received from my public access requests are now considered "public records". Consequently, I have decided to share these public records on my website and publish a narrative summary of what I received. **I am publishing these documents as produced by UDOH. All redactions (or lacktherof) are the sole responsibility of UDOH.***
+
+*In my opinion, UDOH should consider the following policy changes to avoid future issues related to the allocation of scarce medications:*
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Principle to adopt                                                                                                                                                                                                                       | Why it's relevant                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
++==========================================================================================================================================================================================================================================+========================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
+| 1.  Promptly publish all analyses used to justify significant public health measures                                                                                                                                                     | It should not take months of GRAMA disputes to review basic evidence that UDOH cites in making controversial policies. The statistical analyses they relied on for the MAb risk calculator should have been available on day 1.                                                                                                                                                                                                                                                                                                                                        |
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 2.  Require that analyses are reproducible and make the data publicly available (anonymized data if necessary)                                                                                                                           | The underlying data used to set the MAb policy still has never been fully published. It remains unclear whether the analyses produced by Dr. Webb for UDOH would successfully replicate. The data that has been published only contains transformed variables, so it is not possible to test other reasonable specifications. For instance, raw BMI scores for patients were not provided so it's impossible to test whether the cutoff specification selected (2 points for a BMI over 30) performs better than providing more points for higher BMIs (like with age) |
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 3.  Provide sufficient statistical and modeling resources to support physicians and policymakers in order to achieve (1) and (2)                                                                                                         | Physicians have day jobs and are experts in medicine. They are not necessarily experts in statistics or producing replicable analyses. No one at UDOH replicated the Intermountain analyses and at least one issue was missed (i.e., that White and Black patients did not have different predicted probabilities of hospitalization)                                                                                                                                                                                                                                  |
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 4.  Ensure that reasonable alternative hypotheses and specifications are tested, documented, and also made public                                                                                                                        | Dr. Brandon Webb made many decisions in producing his analysis. No one else has access to the underlying raw data to test reasonable alternative model specifications. It is conceivable the coefficients on race could be the result of omitted variable bias introduced via the creation of categorical variables from continuous ones.                                                                                                                                                                                                                              |
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 5.  Ensure legal and ethical perspectives are included when making key public health decisions. If the committee suspects their proposed policy is illegal, then they should not proceed until they have clear guidance that it is legal | Dr. Brandon Webb and Dr. Mark Shah both noted in correspondence that it was possible their policy was illegal under Federal law. Dr. Webb was "surprised" a lawsuit had **not** already been filed. Dr. Webb and Dr. Shah were so concerned about the legality fo their calculator that they wrote to the Office of Civil Rights to get guidance but received no response. Despite the lack of clarity on the legality of the policy, they (and UDOH) pursued the race-based policy regardless                                                                         |
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 6.  Build a culture of accountability. It should be clear who specifically in UDOH is responsible for setting public health policies and he / she should be publicly responsible for those decisions                                     | To my knowledge, no one has resigned over the illegal policy that prioritized patients for medical treatment based on their race. Further, all correspondence suggests that most public policy related to the MAb calculator was functionally set by people who worked for either Intermountain or the University of Utah                                                                                                                                                                                                                                              |
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+## Side projects
+
+In November 2020, an unassuming IT worker in the Utah Department of Health received an urgent email: the Scarce Medications Committee needed his help on an important project. "Just making sure you are kept in the loop on this project", the email read. Attached was a PDF with an unusual name: *Utah CSC Bamlanivimab - Monoclonal Antibodies Project*.
+
+Just over one year later, the contents of that attachment erupted into a national scandal. Tucker Carlson, America's most-watched cable news host, described the contents of the PDF:
+
+> "In Utah, COVID patients are triaged by a scoring system that determines whether or not they qualify for \[...\] potentially lifesaving antibody treatments. Look at this chart, it shows the scoring system. You'll notice that race often counts more than physical health. The State of Utah, for example, gives two points to anyone simply for not being white. You win if you're not white. If you have congestive heart failure at the same time, you get one point. So if you're a white congestive heart failure patient, that's not enough for you."
+
+The Utah Department of Health was caught in a media storm: they had set up a race-based triage system for allocating treatments for COVID-19. Their "risk score calculator" set a higher bar for White Utahns to get access to a Monoclonal Antibodies, a treatment for COVID-19, by giving more qualifying points to non-White patients.
+
+The intense media scrutiny forced UDOH to revisit the race-based risk calculator and conduct a "rapid review of further evidence". Soon after, UDOH would walk back the year-old policy: race, ethnicity, and gender would no longer be used prioritize who was eligible for treatment. Their announcement also noted that the change was also to "ensure that classifications in the risk assessment comply with Federal law" -- effectively an admission that the UDOH's race-based discriminatory policy had been blatantly illegal.
+
+But something was off. Although UDOH's public statements maintained the decision to discriminate on race had always been backed by "data and research provided by Intermountain Healthcare", their analyses had never been released in detail. Further, it was oddly coincidental that the evidence would change right when the policy was under scrutiny.
+
+Amid the controversy, I emailed UDOH asking for the statistical analysis used for the risk calculator - specifically the regression summary table. The risk calculator clearly did not align with known risk factors: age, obesity, and new shortness of breath were known predictors of hospitalization and death from COVID. Why did these factors get so little relative weight compared to race, ethnicity, and gender?
+
+My request set off a flurry of internal emails: key UDOH personnel did not have the analysis. The data had been analyzed by doctors at Intermountain Health, a private healthcare provider in Utah.
+
+Unsure how to respond to the request, Kevin McCulley, the UDOH Preparedness & Response Director, mused to his colleagues, "I suppose we should ask him to GRAMA this information?"
+
+Tom Hudachko, the UDOH head of Communications chimed in: "Since it was \[an\] Intermountain study GRAMA would not be applicable. Do we know if Intermountain is willing to share its research publicly?"
+
+"I do not know", replied the McCulley.
+
+They responded to my request with a one line email: the URL to the same press release that had prompted the initial question. They ignored all subsequent follow-ups.
+
+## GRAMA and apple pie
+
+Every US state has some form of public records "sunshine law". The intent is to provide transparency into key government records and decisions. Sometimes these laws are referred to as "Freedom of Information Acts" or "open records" laws. Utah is no exception.
+
+Utah's law is colloquially known as "GRAMA", short for the Government Records Access and Management Act, and it gives the public broad rights to request and review government records.
+
+In many ways, GRAMA is geared towards transparency. Any record is considered public unless the administrative agency can prove that it should be protected (such as personally identifiable information on citizens).
+
+GRAMA explicitly states that even data and draft documents, if used for deciding government policy, are public records (with very few exceptions). Further, almost all correspondence related to key policy decisions can be reviewed. Utah's government agencies have employees dedicated to finding and preparing records requested by the public.
+
+But these sunshine laws also create perverse incentives: if documents are moved off of government systems (say, into personal emails or computers) then it can be impossible to recover them. Some agencies also outsource key analyses to third parties, which are themselves not subject to the same disclosure rules.
+
+UDOH relied on doctors at Intermountain, a private health provider, to design the MAb triage system. Even though this was a consequential public health policy implemented during the pandemic, there was no way to guarantee public access to the information used to set the policy.
+
+After I received the one-line reply from UDOH, I adopted the strategy that Tom Hudachko had dismissed: filing a GRAMA request for the statistical summary table.
+
+As fate would have it, had I received the summary analysis in response to my first email, this story would likely end here.
+
+Instead, my GRAMA request not only gave me the summary table but all internal UDOH communications related to the risk calculator.
+
+## Who gets what when?
+
+Early on in the pandemic, Monoclonal antibody therapies (MAbs) emerged as a promising treatment option for COVID-19. MAbs effectively antibodies given to a patient to help them fight off a COVID-19 infection. They are typically given to the patient through an intravenous infusion and, by November 2020, the FDA had granted Emergency Use Authorization for several MAbs in treating COVID-19.
+
+The MAb treatments were effective at reducing the severity of the disease but they were scarce. Pharmaceutical companies could physically only produce MAbs so fast. Consequently, public health authorities had to determine which patients would get the available treatment (and who would not).
+
+MAbs not only improved the well-being of the individual patients but also freed up hospital resources by reducing the number of severe COVID cases showing up in the Emergency department. Since MAbs were most effective when given to patients early in the course of the disease they could not simply be administered to patients after they had already ended up in hospital.
+
+Instead, it opened up an opportunity to use predictive analytics: how could public health authorities predict who would benefit most MAb treatments so as to minimize the number of patients ending up in hospital? This would allow them to administer the treatment to patients much earlier in the course of the disease.
+
+Members of the Scarce Medications Committee at UDOH met with researchers from Duke to discuss this problem. The Duke researchers shared a summary of the problem:
+
+> COVID-19 monoclonal antibodies (mAbs) are promising new treatments that lower the risk of hospitalization from COVID-19 when provided early in a patient's disease course. They hold great promise in mitigating the pandemic, and relieving burden on hospitals, but using them effectively will be challenging. Because these drugs will be in short supply and are challenging to administer, it will not be possible to provide them to all patients who could potentially benefit. **It will be important that they be given to COVID-19 patients at the highest risk of hospitalization and death, and administered as early as possible.** [^1] (emphasis added)
+
+[^1]: The COVID 19 Monoclonal Antibodies Challenge: The Right Patient at the Right Time. Marta E. Wosińska, Anna M. Zavodszky, Stephen Colvill, Adam Kroetsch, Mark McClellan. Duke Margolis Working Paper
+
+Planning for the MAb roll-out had started earlier in November. Dr. Mark Shah, a member of UDOH's Scarce Resources Committee and an emergency medicine physician at Intermountain Health, had asked his colleague Dr. Brandon Webb, a fellow committee member and infectious disease specialist at Intermountain Health, to start studying which patients should qualify.
+
+The UDOH Scarce Resources Committee had agreed to adopt a "risk calculator" to determine who would qualify for treatment. They would build an online tool where patients would enter their symptoms and the calculator would provide them a score. If the score was above a published cutoff, they would qualify for MAbs. This would allow UDOH to flex the number of patients as the MAbs became relatively more or less abundant by adjusting the qualifying cutoff.
+
+Dr. Webb was able to leverage a new dataset of patients in Utah to calibrate the calculator. Researchers had been able to link positive test results from testing centers to patients later admitted to the hospital. Although not perfect, this gave Intermountain a dataset that could be used to estimate, based on reported symptoms, comorbidities, and demographics, who was most likely be hospitalized.
+
+One metric Dr. Webb looked at when designing the calculator was the Number Needed to Treat (NNT): how many patients needed to receive MAb infusions in order to (in expectation) avoid one person showing up in the emergency room. By directing the scarce medicine to the patients most likely to be hospitalized, the risk calculator would reduce the NNT of the overall program -- effectively maximizing the benefit to the hospital system for any fixed amount of MAbs that Utah would receive.
+
+According to the Intermountain data that has been made public, about \~6% of patients who tested positive for COVID were hospitalized in the subsequent 14 days. Early studies of MAbs showed that they could reduce the risk of hospitalization by about 60%. Assuming this effect is uniform across the population -- a heroic assumption -- you would need to treat about 28 people with MAbs in order to prevent 1 hospitalization (1/(6%\*60%)=\~28). Instead of random allocation, however, if the MAbs are given to people with higher predicted rates of hospitalization, then fewer patients would need to be treated to prevent a hospitalization.
+
+In the November 2020 draft produced by Dr. Webb, he made a critical decision that would ultimately translate into policy: he created a new variable called "Communities of Color" that he would include in his regressions. In short, he decided that White non-Hispanic Utahns should be treated differently from everyone else.
+
+There is no record that anyone at UDOH questioned this decision at the time. There is no record anyone at UDOH reviewed the analysis to ensure it was performed correctly.
+
+## Down the rabbit hole
+
+The November 2020 analysis performed by Dr. Webb, which relied on data from 20K patients, was never made public while the calculator was in use. In February 2021, Dr. Webb published a paper explaining the high-level methodology. The initial paper did not include the statistical summary table that I had requested.
+
+One of the anonymous reviewers clearly also wanted to see the underlying statistical detail. The reviewer noted that the analysis was neither appropriate nor rigorous and that the authors had not shared the data. Despite this, there was a note on the paper that de-identified data was available upon request from Intermountain. When I emailed Intermountain to get access to the data, they explicitly refused to share the data.
+
+Given that these models were used to quite literally deny people healthcare, the stonewalling was suspicious: why were the authors (and UDOH) refusing to share their data?
+
+And then I received my first response to the GRAMA request. I received thousands of pages of internal correspondence showing the deliberations and discussions on how this critical pandemic policy was formed.
+
+The statistical summary tables were clearly in the emails -- but they had been conspicuously redacted. This led to a long battle - eventually escalated to Nate Checketts, the Director of UDOH -- to de-classify the analysis used to deny countless Utahns medical care because of their race.
+
+![The redacted regression summary table from Dr. Brandon Webb's correspondence with UDOH](images/image-1771991972.png)
+
+Something else also caught my eye: a series of emails from external legal academics that Dr. Webb had forwarded to his UDOH colleague. The UDOH committee had been explicitly warned that the risk calculator was illegal -- something UDOH would admit to in January 2022.
+
+## Violating Federal Law
+
+Early on the morning of Sept 21, 2021, Prof. Teneille Brown, a professor of Law at the University of Utah emailed Dr. Sam Brown, a member of the UDOH Scarce Resources Committee:
+
+> "\[D\]o you recall the data used to de-prioritize \[sic\] older people, men, and people of"non-white race"? \[...\]
+>
+> The use of non-white race really set off alarm bells, not because of clinical risk necessarily, but anti-discrimination law.
+>
+> Any background you have and can share would be very welcome."
+
+Dr. Brown forwarded the note to Dr. Mark Shah, the chair of the committee, who then responded (cc'ing Dr. Webb):
+
+> The lead on this data is Brandon Webb (cced). He has published and presented on this, including to HHS and the CDC, who has lauded our approach
+>
+> I have attached the most recent Mab guidance. The guidance explains all of this, and lays out the data for the derivation.
+
+Another legal academic on the thread, Prof. Leslie Francis, chimed in to clarify that the Utah policy was extremely unusual:
+
+> I'm curious about whether this has ever been reviewed legally. There's been a fair amount of discussion about whether the use of characteristics such as race, sex, or age in making decisions about monoclonal antibodies is prohibited under federal anti-discrimination law, even if evidence based and (as you say) targeting high risk groups. **The consensus among legal academics anyway seems to be that it does violate federal law.** (emphasis added)
+
+Dr. Webb then penned the first explicit defense of the race-based criteria in the correspondence. On several occasions, UDOH subsequently attempted to withhold this email under the "Attorney client privilege" exception in GRAMA. I have reproduced the response here in full (italics in original):
+
+> Thanks for the email. This has been a very interesting dilemma to have been involved with. Your questions (as well as those of your colleague in Maryland and elsewhere) are important, valid, and not surprising. I'm frankly surprised that this has not yet been subject to a legal challenge.
+>
+> At the risk of coming across as "risk stratification apologists" rather than a group of clinicians anxious to do whatever we can to deliver effective treatments equitably to the patients who are most likely to benefit, let me try to provide some background. I hope you find some of this useful.
+>
+> As you probably know, monoclonal antibody therapy has been in use since late November 2020 and from day one has always been limited in terms of capacity to administer. The risk score concept was adopted by the CSC committee in Nov 2020 to address the problem of resource scarcity with the three aims of: 1) optimizing clinical benefit (target treatment to the patients for whom the evidence suggests the treatment will have greatest efficacy, 2) equity (ensure that prioritization does not disadvantage patients who are at high probability of poor outcome from COVID from accessing treatment because of social determinants of health) and 3) adaptability (because of fluctuating drug supply and infusion capacity, and wildly fluctuating community transmission, we needed a prioritization schema that would create a dynamic, data-supported sliding scale eligibility criteria that could be flexed to match supply/capacity with demand). The overarching desire was to use clinical rationale for patient selection rather than "first-come, first-serve" or some type of lottery.
+>
+> We recognized early on however that, for reasons we acknowledge we don't understand, individuals who identify with a community of color are at disproportionately high risk for hospitalization even after accounting for other factors. This has been observed in dozens of epidemiological studies. We identified the same trend in a cohort of more than 100,000 Utahns who tested positive for COVID and for whom we had detailed medical data. In our analysis, after statistically accounting for age, gender, symptoms, chronic medical conditions, and geography, persons of color remained 35-50% more likely to hospitalized.
+>
+> We recognized that in general, gender and race/ethnicity are not included in risk classification for many reasons. However, we were concerned that, given the strong association of non-white race/ethnicity with hospitalization, and the clear benefit of monoclonal antibody treatment in preventing hospitalization, by omitting this characteristic from risk classification, persons of color at statistically equivalent risk would be systematically deprioritized from access to effective therapy.
+>
+> Because of these competing concerns, we wrote a letter to the Office of Civil Rights in November 2020, describing the dilemma and requesting they weigh in. In preparing this letter, we were interested to find that the National Quality Forum had addressed this issue in a 2014 document, suggesting that in certain situations when social determinants such as race or ethnicity are highly correlated with outcomes that could be prevented by more intensive treatment, omission of race or ethnicity in patient selection might actually perpetuate inequity in healthcare access and worsen outcomes disparity (National Quality Forum, Wash. D.C. 2014, "Risk adjustment for socioeconomic status or other sociodemographic factors").
+>
+> We never received a response from OCR and at that point were so enmired in the winter surge of 2020 that we took the pragmatic approach and moved ahead, anticipating that at some point this would likely be subject to other review. It is worth noting that there have been several other risk prediction models in use around the country that also take into account race/ethnicity (Cleveland Clinic has an online tool and UC Irvine does as well). I don't know to what degree these have been adopted for use in allocation. The risk score has been very effective in it's designed aims. We actually have data that suggest that despite intentionally attempting to avoid deprioritizing communities of color through the risk score but also by conducting active outreach and establishing strategically-located treatment sites in geographic areas with lower SES, communities of color are still not receiving MAbs proportionate to their representation among COVID-test positives.
+>
+> One final note that you may find interesting - the FDA emergency use authorization has always included age and medical conditions in the eligibility criteria. In a revision released in June, the language defining the "high-risk" population eligible for treatment included this statement: *Other medical conditions or factors (for example, race or ethnicity) may also place individual patients at high risk for progression to severe COVID-19 and authorization of REGEN-COV under the EUA is not limited to the medical conditions or factors \[listed above\]. For additional information on medical conditions and factors associated with increased risk for progression to severe COVID, see the CDC website: https://www.cdc.gov/coronavirus/2019-ncov/need-extra- precautions/people-with-medicalconditions.html. Healthcare providers should consider the benefit-risk for an individual patient.vvvv https://www.fda.gov/media/145611/download .*
+>
+> I hope that helps frame context a bit. I don't believe this approach has been reviewed legally, but not for lack of us requesting long ago.
+
+It is worth noting that, in his "final note", Dr. Webb explicitly relies on the FDA's EUA, which parenthetically references the possibility of using race to discriminate between patients. Dr. Webb failed to mention was that he had been instrumental in including race and ethnicity in the FDA wording.
+
+Several months earlier, in June 2021, Dr. Webb had seen the updated EUA from the FDA and wrote to his committee colleagues:
+
+> I reviewed the updated EUA treatment criteria and was pleasantly surprised to see explicit endorsement of our approach to take other factors such as race or ethnicity into account.
+
+Dr. Shah sent a note to the committee in reference to the same EUA:
+
+> FYI, Andy Pavia said that the FDA reviewed our Utah Risk Score and used it as precedent for including "race and other risk factors" as qualifiers.
+
+The law professors, unaware of this sleight of hand, asked if they could speak to Dr. Webb on the phone with an academic colleague from Maryland. Dr. Brown removed the law professors and wrote to Dr. Webb and Dr. Shah directly:
+
+> I'd probably clear the discussions with communications and legal before chatting with the Maryland person. We don't want them to write something that then becomes an exploded landmine.
+
+Dr. Webb replied:
+
+> For sure. I'd prefer just using the "we're too busy trying to save lives during the surge" excuse.
+>
+> My preference is to \[keep\] our heads down as much as possible.
+
+## Trust but verify
+
+Dr. Brandon Webb used a multivariate logit regression, a relatively common statistical technique, to understand the relative risk of hospitalization associated with the comorbidities and demographics of Utah COVID patients.
+
+Most of the variables that Dr. Webb included in his analysis were either true / false or categorical variables (e.g., race). In order to make a regression work, categorical variables are converted into something akin to true / false variables: a baseline state is selected and treated as the default state. Other states are then treated as deviations from the baseline using true / false variables. The coefficient on these new true / false variables can then be interpreted as the effect of deviating from the default state. Consequently, the default state will not appear in the regression summary table.
+
+For instance, given the public statements, it is clear that Dr. Webb intended White non-Hispanic to be the default state. He could then interpret the coefficients on non-White patients as the associated impact of being from a "Community of Color". In general, we should not expect to see "White" or "non-Hispanic" in Dr. Webb's summary tables since those are the default states.
+
+In August of 2022, Dr. Webb ran a replication of the original analysis in order to see if race and ethnicity should remain in the risk calculator. He explained to his colleagues:
+
+> I wanted to check to see if the demographics of COVID and risk factors for hospital admission have changed since we first started this. The biggest change of course since we began MAbs is the availability of vaccines. Please pardon that what follows is technical data. The following are regression models from unpublished, confidential Intermountain data from over 106,000 consecutive COVID positive Utahns since Nov 1, 2021
+>
+> 1.  In this model, you see that when accounting for trends in time, age, gender, shortness of breath and chronic medical conditions, **most race/ethnicity identifiers are indeed significant.**
+
+Dr. Webb then concludes:
+
+> Key take aways for me:
+>
+> 1.  Among Utahns with COVID-19, race and/or ethnicity remains a significant determinant of hospitalization at this point in the pandemic, even when considering vaccination status.
+>
+> 2.  Omitting race/ethnicity from the risk score would deprioritize patients at clearly higher mathematical probability of hospitalization from accessing MAb treatments.
+>
+> 3.  The FDA emergency use authorization explicitly allows for consideration of race/ethnicity in determining who to treat:
+>
+>     "Other medical conditions or factors (for example, race or ethnicity) may also place individual patients at high risk for progression to severe COVID-19 and authorization of REGEN-COV under the EUA is not limited to the medical conditions or factors listed above \[...\]"
+
+Dr. Webb was referring to the table below -- but no one on the thread realized that Dr. Webb had made an error in his analysis: he coded the wrong baseline.
+
+Instead of coding "White" as the baseline value, Dr. Webb used "Multiple / Other / Declined" as the baseline.
+
+Given this error, Dr. Webb's conclusions in his email do not hold. First, this table cannot be used to conclude "most race/ethnicity identifiers are indeed significant" relative to White Utahns; the values in the table presented are all relative to patients who selected "Multiple / Other / Declined". Second, closer examination of the table shows that White patients have a **higher** likelihood of hospitalization than the baseline. Even more awkward is that the odds ratio coefficient on White Utahns (1.394) is nearly the same as on Black / AA (1.399). According to Dr Webb's own regression, the rate of hospitalization for White and Black Utahns is the same when other factors are accounted for.
+
+![](images/image-476025347.png)
+
+Had the regression been run and interpreted correctly, this fact would have been known in November 2020. Instead, this mistake was only identified in January 2022. During the "rapid re-evaluation" of the evidence, Dr. Webb presented a replication of the above analysis showing there was no statistically measurable difference between black and white patients.
+
+Upon receiving the updated analysis produced by Dr. Webb, Michelle Hofmann, the Deputy Director and Chief Medical Advisor to UDOH, messaged Kevin McCulley. They were both surprised to see a result that should have been readily apparent in November 2020: there was no statistically distinguishable difference in hospitalization rates between black and white patients. They noted that **this fact alone** would be enough to eliminate race from the calculator.
+
+![](images/image-1687457954.png)
+
+It is important to note that **this error went** **unnoticed for over two years despite being apparent in the most basic regression summary table.** This also includes not being detected during the "peer review" publication process on a related paper or by the FDA when they used this analysis to update the EUA. Clearly UDOH and Intermountain had insufficient quality controls in place to catch such a simple mistake and other committee members were neither willing nor capable fo reviewing the analysis of their peer.
+
+This alone illustrates the importance of being transparent with analysis: there was no reason it should have taken two years to uncover this bust.
+
+## "Communities of Color"
+
+Dr. Webb's regression output does, however, still contain differences in hospitalizations by race. In particular, Native Hawaiians and Pacific Islanders and American Indians are outliers in terms of hospitalization relative to the rest of the population.
+
+## Diversity, Equity, and Inclusion
+
+![](images/image-688074169.png)
+
+### Annika Machado, RN
+
+COVID-19 Health Disparities Coordinator
+
+https://healthequity.utah.gov/welcome-to-ohe/
+
+## The garden of forking paths / A bust in the model?
+
+Hypothesis: using a cutoff of 30 BMI is forcing some of the OVB into race
+
+The only race that is significant is PI - and they have higher rate of obesity
+
+Non-linear aspect to age + obesity mean that cutoff might not be appropriate
+
+In a later submission, th
+
+Known unknowns: it was illegal
+
+Massive loss of trust in public health
+
+One reform is that public health data & analysis must be transparent
+
+If your data & analysis is being used to deny care, it better be correct
+
+Looking for race
+
+Sloppy work
+
+Adding a number to a calculator feels good but it ultimately doesn't help solve REAL problems in the world. (e.g., getting the drugs to remote reservations)
+
+Have a policy of public money, public code, public data
+
+Agencies outsource decisions and analyses to avoid scrutiny
+
+Reversed the policy as soon as the drugs stopped working:
+
+https://www.wired.com/story/a-crucial-group-of-covid-drugs-has-stopped-working/
+
+## 
+
+https://www.theatlantic.com/health/archive/2022/10/covid-variants-antibody-treatments-immunocompromised/671929/
+
+Circular evidence / evidence laundering
+
+Utah UDOH needs to admit what it did was wrong: in future pandemics, they should
+
+-   Don't use race-based triage methods
+
+-   Publish data & code - no reason not to
+
+continue\[s\] to strongly advocate that public health policy and medical treatment decisions be based on **accurate epidemiologic data, sound medical evidence and independent and objective expert consultation, rather than political influence of any kind.**
+
+https://www.science.org/doi/10.1126/science.adh9594
+
+Health officials were drunk on power with no constraints. How did we end up in a situation where a blatantly illegal policy was implemented for over a year with no oversight?
+
+Unless public health agencies live up to the minimum standards of data replication, why should we trust them with life and death decisions?
+
+A large amount of goodwill towards public health was squandered in the pandemic.
+
+Low trust among blacks for doctors is now shared by many republicans. This cannot be seen as a success
+
+## Non-public public information
+
+**Research question: how effective are MAb at reducing hospitalization? Is it uniform across the population? If not then the analysis becomes much more complex**
+
+-   It was known that MAbs do NOT have a uniform effect on the population - more effective with older patients
+
+-   **The researchers found that after 28 days, 1.6% of the treated group were hospitalized, compared with 4.8% of the untreated group. Overall, the treated group consistently required hospitalization 60--70% less often. https://www.medicalnewstoday.com/articles/covid-19-monoclonal-antibody-combo-helps-high-risk-people-avoid-hospital#A-significant-difference\\**
+
+-   At Day 14, 1.3% of the treated group was in the hospital, compared to 3.3% of those who had not been treated. At Day 21, only 1.3% treated was hospitalized, compared to 4.2% of those who had not been treated. At the end of 28 days, 1.6% of those treated was hospitalized versus 4.8% of those who had not been treated. This translated to 60%--70% relative reduction in hospitalization among treated patients. Of those who were subsequently hospitalized, the rates of ICU admission and mortality were low. https://newsnetwork.mayoclinic.org/discussion/monoclonal-antibody-treatment-combo-reduces-hospitalization-among-high-risk-patients-with-covid-19/
+
+-   Dr. Brandon Webb, an infectious disease physician at Intermountain Healthcare, says that monoclonal antibody treatments are **up to 80% effective in reducing the likelihood of hospitalization or death for COVID-19.**
+
+-   A study conducted by Intermountain Healthcare showed a 57% reduction in the rate of needing hospitalization for nearly 600 people who received the monoclonal antibodies within seven days of feeling symptoms, and 31% less likely to need emergency care.
+
+## The Governor's team
+
+Sept 2, 2021 -
+
+\-\-\-\--
+
+This data comes from an academic paper on COVID hospitalizations from Utah. The data is publicly available [here](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0261508) (scroll down to the "Supporting information" section or download the data [here](https://ndownloader.figstatic.com/files/34284796)).
+
+This data was used as part of the Utah Department of Health's (UDOH) policy on rationing Monoclonal Antibodies (a treatment for COVID). This policy received widespread national attention as the state decided to preferentially provide the treatment to patients based on their race.
+
+UDOH published a risk score calculator that provided "points" based on the demographics or co-morbidities of the patients. The calculator was based on a statistical analysis performed in the above linked paper.
+
+After the public attention, UDOH requested that the academics who performed the analysis revisit their models. They looked at the probability that someone is hospitalized conditional on age, gender, race, ethnicity, symptoms and diagnosis, co-morbidities, residence, and health equity surrogates.
+
+The researchers found that:
+
+-   **Age** was a strong predictor of hospitalization (especially for those over 40)
+
+-   **Males** were more likely to have worse outcomes
+
+-   Certain **symptoms** were strongly informative on whether someone would be hospitalized (e.g., new shortness of breath)
+
+-   Certain **co-morbidities** were strongly linked to hospitalization (e.g., obesity)
+
+-   **Race** (specifically a constructed variable called "Communities of Color") was a predictor of hospitalization (controlling for all of the above)
+
+Consequently, they recommended that race be given a very strong weighting in the distribution of medical treatment to patients. Note that this data is from **before the roll-out of vaccines** so that is not a variable in this dataset.
+
+They created the below risk calculator based on their statistical analysis. A patient was eligible for treatment if they scored above a threshold score:
+
+![](images/image-1166367734.png){fig-align="center" width="389"}
+
+The purpose of this short paper is to use the data that they have made public to replicate a similar analysis (using Bayesian techniques) and compare an alternative model against the researchers' proposed risk calculator.
+
+Ultimately, hospitalization is a relatively rare occurrence: only 3.6% of patients in the dataset were hospitalized. Death from COVID was even more rare: overall only 0.4% of patients in the dataset died. Despite having 22,816 observations, we are estimating a rather rare event, which makes it a rather challenging exercise. Further, some of the covariates themselves are rare, which raises the risk of overfitting.
+
+Before proceeding with this exercise, it is worth noting some issues that are immediately apparent when attempting to replicate this paper:
+
+-   First, it is unclear that the data made publicly available matches the regressions in the paper. For instance, in a strict medical sense, myocardial infarction (the field available in the data) is not the same as chronic artery disease (the variable in the paper's regression table). Thus it is unclear that the exact model can be exactly replicated. Regardless, I will move ahead with the modeling exercise as best I can.
+
+-   Second, some of the tables in the paper are not internally consistent. In the below table, you will see that it states that 8753 patients (38% of 22,816) are from Communities of Color. The table, however, notes that this represents 43.9% of the sample.
+
+![](images/image-1355993897.png)
+
+Below are the paper's estimates from running a Logit regression. I am able to almost exactly replicate these coefficients using Bayesian techniques **except for the coefficient on immunosuppression.**
+
+![](images/image-1938652705.png)
+
+## Environment setup
+
+In order to run the subsequent code, this section is designed to load the appropriate data and packages. This assumes you have downloaded the data from the links above and saved it as a CSV in your local environment.
+
+```{r}
+#| label: setup
+#| echo: false
+
+
+library(tidyverse)
+library(rjags)
+library(janitor)
+library(Hmisc)
+library(binom)
+library(gridExtra)
+library(grid)
+library(ggpubr)
+
+data<-read.csv("./data/pone.0261508.s001.csv")
+
+data <- data %>%
+  clean_names()
+
+data$age<-as.numeric(data$age)
+data$charlson<-as.numeric(data$charlson)
+
+data <- data %>% 
+        filter(sex == "Female" | sex == "Male") 
+
+
+data <- cbind(data,model.matrix(~ sex - 1, data = data))
+data <- cbind(data,model.matrix(~ race - 1, data = data))
+data <- cbind(data,model.matrix(~ ethnicity - 1, data = data))
+
+data <- data %>%
+  clean_names()
+
+data$white_nh <- ifelse(data$race == "White" & data$ethnicity == "Not Hispanic, Latino, or Spanish Origin", 1, 0)
+
+data$coc <- ifelse(data$race_black_or_african_american == 1 | data$race_asian ==1 | data$race_american_indian_or_alaska_native == 1 | data$race_multiple == 1 | data$race_native_hawaiian_or_pacific_islander == 1 | data$ethnicity_hispanic_latino_or_spanish_origin == 1, 1, 0)
+
+data %>% tabyl(race, ethnicity)
+
+data <- data %>%
+  clean_names()
+
+test<- data[data$data_type == "Validation",]
+train<-data[data$data_type == "Derivation",]
+
+transform_int<-names(data[sapply(data,is.integer)])
+data[,transform_int]<-lapply(data[,transform_int], factor)
+
+transform_cha<-names(data[sapply(data,is.character)])
+data[,transform_cha]<-lapply(data[,transform_cha], factor)
+```
+
+The data contains 22,816 observations and 33 variables. I drop the few observations where the person has not identified their gender as either Male or Female (30 respondents said they were either "Both" or "Unknown").
+
+It is worth noting that several of the tables in the PLOS paper are not internally consistent (the percents do not match the numbers) so I've done my best to match the analysis they performed.
+
+## Exploratory data analysis
+
+```{r}
+#| label: exploratory-tables
+#| echo: false
+data %>% 
+        filter(sex == "Female" | sex == "Male") %>% 
+        tabyl(sex) %>% 
+        as.tibble()
+
+data %>%
+        tabyl(hospitalized_14_days) %>%
+        as.tibble()
+
+data %>% 
+        tabyl(race) %>% 
+        as.tibble()
+
+data %>% 
+        tabyl(ethnicity) %>% 
+        as.tibble()
+
+data %>% 
+        tabyl(race, ethnicity) %>% 
+        adorn_percentages(denominator = "col") %>% 
+        as.tibble()
+
+```
+
+Looking through the raw data, there are several points worth noting:
+
+-   The respondents are almost exactly half Male / Female
+
+-   In terms of race, the vast majority of respondents are either White or Unknown (\>90%) - only 8% of respondents identify as a race other than White or Unknown
+
+-   About 30% of respondents are Hispanic; of those who identify as Hispanic, 77% are White, 20% are Unknown, and 2% either identify as a race other than White or Unknown
+
+```{r, warning = FALSE, message=FALSE}
+#| label: data-plots-eda
+#| echo: false
+
+data %>% ggplot(aes(x=age)) +
+        geom_histogram(binwidth=1)+
+        ggtitle("Frequency by age: Young people are much more likely to be in the data")
+
+data %>% ggplot(aes(x=age,color = hospitalized_14_days))+
+        geom_density()+
+        ggtitle("Age distribution by hospitalization status")
+
+# data %>% ggplot(aes(x=age,color = x28_d_mortality))+
+#         geom_density()+
+#         ggtitle("People who are die tend to be over 50")
+
+data %>% ggplot(aes(x=age,color = sex))+
+        geom_density()+
+        ggtitle("The age distribution in the data of men and women")
+
+# data %>% ggplot(aes(x=age,color = race))+
+#         geom_density()+
+#         ggtitle("Although noisy, the age distributions of different races overlap")
+
+data %>% filter(hospitalized_14_days == 1) %>% 
+        ggplot(aes(x=age,color = race))+
+        geom_density() +
+        ggtitle("Hospitalized by race")
+
+data %>% 
+        count(ethnicity, hospitalized_14_days) %>% 
+        group_by(ethnicity) %>% 
+        mutate(freq = n / sum(n)) %>% 
+        filter(hospitalized_14_days == 1) %>% 
+        ggplot(aes(x=ethnicity,y=freq, fill = ethnicity)) +
+        geom_bar(stat="identity") +
+        coord_flip()+
+        ggtitle("Average hospitalization rate by ethnicity")+
+        theme(legend.position = "none")
+
+# data %>% 
+#         count(race, x28_d_mortality) %>% 
+#         group_by(race) %>% 
+#         mutate(freq = n / sum(n)) %>% 
+#         filter(x28_d_mortality == 1) %>% 
+#         ggplot(aes(x=race,y=freq)) +
+#         geom_bar(stat="identity") +
+#         coord_flip()+
+#         ggtitle("The mortality rate differs across race")
+
+# data %>% 
+#         count(age, hospitalized_14_days) %>% 
+#         group_by(age) %>% 
+#         mutate(freq = n / sum(n)) %>% 
+#         filter(hospitalized_14_days == 1) %>% 
+#         ggplot(aes(x=age,y=freq)) +
+#         geom_bar(stat="identity") +
+#         ggtitle("Age is strongly associated with hospitalization")
+
+# data %>% 
+#         count(age, x28_d_mortality) %>% 
+#         group_by(age) %>% 
+#         mutate(freq = n / sum(n)) %>% 
+#         filter(x28_d_mortality == 1) %>% 
+#         ggplot(aes(x=age,y=freq)) +
+#         geom_bar(stat="identity") +
+#         ggtitle("Age is strongly associated with death within 28 days")
+
+
+data %>% 
+        count(race, hospitalized_14_days) %>% 
+        group_by(race) %>% 
+        filter(race != "Multiple") %>% 
+        mutate(freq = n / sum(n)) %>% 
+        filter(hospitalized_14_days == 1) %>% 
+        ggplot(aes(x=race,y=freq,fill = race)) +
+        geom_bar(stat="identity") +
+        coord_flip()+
+        ggtitle("Hospitalization rate by age and race")+
+        theme(legend.position = "none")
+
+# data %>% 
+#         count(age, hospitalized_14_days) %>% 
+#         group_by(age) %>% 
+#         mutate(freq = n / sum(n)) %>% 
+#         filter(hospitalized_14_days == 1) %>% 
+#         ggplot(aes(x=age,y=n)) +
+#         geom_bar(stat="identity") +
+#         ggtitle("The total number hospitalized is bell-shaped because there are few old people")
+
+data %>% 
+        count(age, hospitalized_14_days) %>% 
+        group_by(age) %>% 
+        mutate(freq = n / sum(n)) %>% 
+        filter(hospitalized_14_days == 1) %>% 
+        ggplot(aes(x=age,y=freq)) +
+        geom_point() +
+        geom_smooth(method = "loess") +
+        ggtitle("Hospitalization rate by age")
+
+# data %>% 
+#         count(age, x28_d_mortality) %>% 
+#         group_by(age) %>% 
+#         mutate(freq = n / sum(n)) %>% 
+#         filter(x28_d_mortality == 1) %>% 
+#         ggplot(aes(x=age,y=freq)) +
+#         geom_point() +
+#         geom_smooth(method = "loess") +
+#         ggtitle("Risk of death increases significantly after age 80...")
+
+
+
+# create a list of variables to plot
+vars_to_plot <- c(
+  "sex_male",
+  "fever_flg",             
+  "cough_flg",             
+  "sob_flg",               
+  "body_aches_flg",       
+  "runny_nose_flg",        
+  "decr_smell_flg",        
+  "sore_throat_flg",       
+  "diarrhea_flg",         
+  "diabetes",              
+  "hypertension",          
+  "myocardial_infarction", 
+  "cardiac_arrhythmia",   
+  "chronic_pulmonary",     
+  "renal_disease",         
+  "chf",                   
+  "liver_disease",        
+  "metastatic_carcinoma",  
+  "obesity",               
+  "aids_hiv",              
+  "transplant_flag",      
+  "immunosupp",            
+  "cerebrovascular",       
+  "neuro_disorders"
+)
+
+# create an empty list to store the plots
+plot_list <- list()
+
+# loop through each variable and create the plot
+for (var in vars_to_plot) {
+        temp <- data %>%
+                count(!!sym(var), hospitalized_14_days, .drop = FALSE) %>%
+                group_by(!!sym(var)) %>%
+                pivot_wider(
+                        names_from = hospitalized_14_days,
+                        names_prefix = "hosp",
+                        values_from = n
+                ) %>%
+                mutate(total = hosp0 + hosp1)
+        
+        CI <- binom.confint(x = temp$hosp1,
+                            n = temp$total,
+                            methods = "wilson")
+        CI <- cbind(temp, CI)
+        CI$label <- round(CI$mean,2)
+        p <- ggplot(data = CI,aes(x = !!sym(var), y = mean, label = label))+
+                geom_bar(
+                        stat = "identity",
+                        fill = "skyblue",
+                        alpha = 0.5
+                ) +
+                geom_text(size = 3, position = position_stack(vjust = 0.5))+
+                geom_pointrange(
+                        aes(
+                                x = !!sym(var),
+                                y = mean,
+                                ymin = lower,
+                                ymax = upper
+                        ),
+                        colour = "blue",
+                        alpha = 0.9,
+                        size = .2
+                ) +
+                ggtitle(var) +
+                ylim(0, .5) +
+                theme(
+                        text = element_text(size = 6),
+                        axis.title.x = element_blank(),
+                        axis.text.x = element_blank(),
+                        axis.ticks.x = element_blank(),
+                        axis.title.y = element_blank(),
+                        axis.text.y = element_blank(),
+                        axis.ticks.y = element_blank(),
+                        panel.spacing = unit(0.1, "lines")
+                )
+        # add the plot to the list
+        plot_list[[var]] <- p
+}
+
+# create the facet wrap plot
+
+ggarrange(plotlist = plot_list, ncol=6, nrow = 4, common.legend = TRUE, legend="bottom") %>% 
+annotate_figure(., top = textGrob("Relative hospitalization rates by comorbidities (y range 0-50%)"))
+
+data %>% 
+        count(age, obesity, hospitalized_14_days) %>% 
+        group_by(age, obesity) %>% 
+        mutate(freq = n / sum(n)) %>% 
+        filter(hospitalized_14_days == 1) %>% 
+        ggplot(aes(x=age,y=freq, color = obesity)) +
+        geom_point() +
+        geom_smooth(method = "loess") +
+        ggtitle("Hospitalization rate for Obese by age")
+
+
+data %>% 
+        count(age, coc, hospitalized_14_days) %>% 
+        group_by(age, coc) %>% 
+        mutate(freq = n / sum(n)) %>% 
+        mutate(coc = as.factor(coc)) %>% 
+        filter(hospitalized_14_days == 1) %>% 
+        ggplot(aes(x=age,y=freq, color = coc)) +
+        geom_point() +
+        geom_smooth(method = "loess") +
+        ggtitle("Hospitalization for CoC by age")
+
+
+
+# data %>% 
+#         count(age, race, hospitalized_14_days) %>% 
+#         group_by(age, race) %>% 
+#         mutate(freq = n / sum(n)) %>% 
+#         mutate(race = as.factor(race)) %>% 
+#         filter(hospitalized_14_days == 1) %>% 
+#         ggplot(aes(x=age,y=freq, color = race)) +
+#         geom_point() +
+#         geom_smooth(method = "loess") +
+#         ggtitle("TBD")
+
+data %>% 
+        count(age, ethnicity, hospitalized_14_days) %>% 
+        group_by(age, ethnicity) %>% 
+        mutate(freq = n / sum(n)) %>% 
+        mutate(race = as.factor(ethnicity)) %>% 
+        filter(hospitalized_14_days == 1) %>% 
+        ggplot(aes(x=age,y=freq, color = ethnicity)) +
+        geom_point() +
+        geom_smooth(method = "loess") +
+        ggtitle("Hospitalization rate by ethinicity and age")
+
+data %>% 
+        count(age, ethnicity, obesity) %>% 
+        group_by(age, ethnicity) %>% 
+        mutate(freq = n / sum(n)) %>% 
+        mutate(ethnicity = as.factor(ethnicity)) %>% 
+        filter(obesity == 1) %>% 
+        ggplot(aes(x=age,y=freq, color = ethnicity)) +
+        geom_point() +
+        geom_smooth(method = "loess") +
+        ggtitle("Obesity rates by ethnicity and age")
+
+
+data %>% 
+        count(age, race, obesity) %>% 
+        group_by(age, race) %>% 
+        filter(race != "Multiple") %>% 
+        mutate(freq = n / sum(n)) %>% 
+        mutate(race = as.factor(race)) %>% 
+        filter(obesity == 1) %>% 
+        ggplot(aes(x=age,y=freq, color = race)) +
+        geom_point() +
+        geom_smooth(method = "loess") +
+        ggtitle("Obesity rates by race (excluding Multiple) and age")
+
+# data %>% 
+#         count(age, coc, x28_d_mortality) %>% 
+#         group_by(age, coc) %>% 
+#         mutate(freq = n / sum(n)) %>% 
+#         mutate(coc = as.factor(coc)) %>% 
+#         filter(x28_d_mortality == 1) %>% 
+#         ggplot(aes(x=age,y=freq, color = coc)) +
+#         geom_point() +
+#         geom_smooth(method = "loess") +
+#         ggtitle("Death is quite rare")
+
+# create an empty list to store the plots
+plot_list2 <- list()
+
+data$sex_male<-as.factor(data$sex_male)
+# loop through each variable and create the plot
+for (var in vars_to_plot) {
+  p <- data %>%
+    count(!!sym(var), age, hospitalized_14_days, .drop = FALSE) %>%
+    group_by(!!sym(var), age) %>%
+    mutate(freq = n / sum(n)) %>% 
+    filter(hospitalized_14_days == 1) %>% 
+    ggplot(aes(x=age,y=freq, color = !!sym(var))) +
+        geom_point(size = .1) +
+        geom_smooth(method = "loess")+
+        ggtitle(var)+
+        ylim(0,1)+
+        theme(text = element_text(size = 6), axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(), panel.spacing = unit(0.1, "lines"), legend.position = "none")
+  # add the plot to the list
+  plot_list2[[var]] <- p
+}
+data$sex_male<-as.numeric(data$sex_male)
+# create the facet wrap plot
+
+ggarrange(plotlist = plot_list2, ncol=6, nrow = 4, common.legend = TRUE, legend="bottom") %>% 
+annotate_figure(., top = textGrob("Hospitalization rates by comorbidity and age"))
+
+####--------------------------
+## Modify the code below to show the rates of comorbidity by race & ethnicity
+
+
+vars_to_plot_2 <- c(
+  "sex_male",
+  "fever_flg",             
+  "cough_flg",             
+  "sob_flg",               
+  "body_aches_flg",       
+  "runny_nose_flg",        
+  "decr_smell_flg",        
+  "sore_throat_flg",       
+  "diarrhea_flg",         
+  "diabetes",              
+  "hypertension",          
+  "myocardial_infarction", 
+  "cardiac_arrhythmia",   
+  "chronic_pulmonary",     
+  "renal_disease",         
+  "chf",                   
+  "liver_disease",        
+  "metastatic_carcinoma",  
+  "obesity",               
+  "aids_hiv",              
+  "transplant_flag",      
+  "immunosupp",            
+  "cerebrovascular",       
+  "neuro_disorders"
+)
+
+plot_list_2 <- list()
+
+
+# loop through each variable and create the plot
+for (var in vars_to_plot_2) {
+  p <- data %>%
+    count(race, !!sym(var), age, .drop = FALSE) %>%
+    group_by(race, age) %>%
+          filter(race != "Multiple") %>% 
+    mutate(freq = n / sum(n)) %>% 
+    filter(!!sym(var) == 1) %>% 
+    ggplot(aes(x=age,y=freq, color = race)) +
+        geom_point(size = .1) +
+        geom_smooth(method = "loess")+
+        ggtitle(var)+
+        ylim(0,1)+
+        theme(text = element_text(size = 6), axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(), panel.spacing = unit(0.1, "lines"), legend.position = "none")
+  # add the plot to the list
+  plot_list_2[[var]] <- p
+}
+
+# create the facet wrap plot
+
+# grid.arrange(grobs = plot_list_2, ncol = 6,top=textGrob("Prevalence of comorbidities by race and age"))
+ggarrange(plotlist = plot_list_2, ncol=6, nrow = 4, common.legend = TRUE, legend="bottom") %>% 
+annotate_figure(., top = textGrob("Prevalence of comorbidities by race and age"))
+
+# loop through each variable and create the plot
+for (var in vars_to_plot_2) {
+  p <- data %>%
+    count(ethnicity, !!sym(var), age, .drop = FALSE) %>%
+    group_by(ethnicity, age) %>%
+    mutate(freq = n / sum(n)) %>% 
+    filter(!!sym(var) == 1) %>% 
+    ggplot(aes(x=age,y=freq, color = ethnicity)) +
+        geom_point(size = .1) +
+        geom_smooth(method = "loess")+
+        ggtitle(var)+
+        ylim(0,1)+
+        theme(text = element_text(size = 6), axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(), panel.spacing = unit(0.1, "lines"), legend.position = "none")
+  # add the plot to the list
+  plot_list_2[[var]] <- p
+}
+
+# create the facet wrap plot
+
+# grid.arrange(grobs = plot_list_2, ncol = 6,top=textGrob("Prevalence of comorbidities by ethnicity and age"))
+ggarrange(plotlist = plot_list_2, ncol=6, nrow = 4, common.legend = TRUE, legend="bottom") %>% 
+annotate_figure(., top = textGrob("Prevalence of comorbidities by ethnicity and age"))
+
+
+
+for (var in vars_to_plot_2) {
+        p <- data %>%
+                count(!!sym(var), ethnicity, .drop = FALSE) %>%
+                group_by(ethnicity) %>%
+                mutate(freq = n / sum(n)) %>%
+                filter(!!sym(var) == 1) %>%
+                ggplot(aes(
+                        x = ethnicity,
+                        y = freq,
+                        fill = ethnicity
+                )) +
+                geom_bar(stat = "identity") +
+                ggtitle(var) +
+                ylim(0, 1) +
+                theme(
+                        text = element_text(size = 6),
+                        axis.title.x = element_blank(),
+                        axis.text.x = element_blank(),
+                        axis.ticks.x = element_blank(),
+                        axis.title.y = element_blank(),
+                        axis.text.y = element_blank(),
+                        axis.ticks.y = element_blank(),
+                        panel.spacing = unit(0.1, "lines"),
+                        legend.position = "none"
+                )
+        
+        plot_list_2[[var]] <- p
+}
+# grid.arrange(grobs = plot_list_2, ncol = 6,top=textGrob("Prevalence of comorbidities by ethnicity"))
+ggarrange(plotlist = plot_list_2, ncol=6, nrow = 4, common.legend = TRUE, legend="bottom") %>% 
+annotate_figure(., top = textGrob("Prevalence of comorbidities by ethnicity"))
+
+
+for (var in vars_to_plot_2) {
+        p <- data %>%
+                count(!!sym(var), race, .drop = FALSE) %>%
+                group_by(race) %>%
+                mutate(freq = n / sum(n)) %>%
+                filter(race != "Multiple") %>% 
+                filter(!!sym(var) == 1) %>%
+                ggplot(aes(
+                        x = race,
+                        y = freq,
+                        fill = race
+                )) +
+                geom_bar(stat = "identity") +
+                ggtitle(var) +
+                ylim(0, 1) +
+                theme(
+                        text = element_text(size = 6),
+                        axis.title.x = element_blank(),
+                        axis.text.x = element_blank(),
+                        axis.ticks.x = element_blank(),
+                        axis.title.y = element_blank(),
+                        axis.text.y = element_blank(),
+                        axis.ticks.y = element_blank(),
+                        panel.spacing = unit(0.1, "lines"),
+                        legend.position = "none"
+                )
+        
+        plot_list_2[[var]] <- p
+}
+# grid.arrange(grobs = plot_list_2, ncol = 6,top=textGrob("Prevalence of comorbidities by race"))
+ggarrange(plotlist = plot_list_2, ncol=6, nrow = 4, common.legend = TRUE, legend="bottom") %>% 
+annotate_figure(., top = textGrob("Prevalence of comorbidities by race"))
+
+```
+
+The above shows a number of charts that explore the relationship between age, patient identity and other co-morbidities.
+
+These charts clearly show that hospitalization rates can differ substantially for co-morbidities and other patient attributes. Clearly, some are strongly associated with higher frequency of hospitalization (e.g., diabetes or myocardial infarction). Others either appear to have little relationship or *negative* relationship (e.g., runny nose, decrease smell, sore throat).
+
+Interestingly, the relationship between risk of hospitalization and age is not a perfectly linear relationship: once someone is over the age of \~75, their risk of hospitalization increases substantially.
+
+Some co-morbidities appear to uniformly increase / decrease risk: obesity, for instance, increases the risk of hospitalization across all age groups. Others appear to have a disproportionate impact among the elderly: fever, cough, shortness of breath, and body aches are all associated with higher risk of hospitalization among the elderly.
+
+Communities of Color -- the categorization of race and ethnicity used by the Utah researchers -- appears to be associated with higher hospitalization rates among the elderly. That said, the effect of race and ethnicity do not appear uniform -- and it is not clear why Communities of Color should be the relevant covariate. It appears that Pacific Islanders and American Indians have substantially higher hospitalization rates than Whites.
+
+It is worth noting that the Utah researchers were explicitly modeling the differential impact of race on COVID but in the model they fit, they implicitly assume that **all other medical issues** are have the same effect across of race / ethnicity (since they do not include any interaction terms in their regression).
+
+## Modeling the process
+
+As noted above, the data that is published with the paper does not appear to contain all the relevant covariates. Regardless, I will attempt to replicate the paper as closely as possible with the data available. Further, I will fit several models to see whether other reasonable models perform better than the model included in the PLOS paper.
+
+-   Model 1: Age, all comorbidities
+
+-   Model 2: Add Age2 - Age, Age2, all comorbidities
+
+-   Model 3A: Add Male sec - Male sex, age2, age, all comorbidities
+
+-   Model 4: Add White NH - White Non-Hisp, Male sex, age2, age, all comorbidities
+
+-   Model 5: Communities of Color, Male sex, Age, all comorbidities
+
+-   Model 6: Add Age2 to PLOS - Age2, CoC, Male sex, age, all comorbidities
+
+-   Model 7: Interaction effects - Sex male, age x (all comorbidities)
+
+-   **Model 8:** Distinct races - Sex male, age, White, Asian, Black, Native Hawaii, Hisp, comorbidities
+
+-   Model 9: Age ONLY
+
+-   **Model 10:** PLOS Paper model replication
+
+-   Model 11: Model 8 but with fewer comorbidities
+
+The below code, which takes a very long time to run, produces these 10 models, calculates their DIC and saves their outputs. It takes some time to run; all models appear to converge well.
+
+```{r}
+#| label: model-detail
+#| echo: false
+#| output: false
+
+set.seed(2023)
+
+#MODEL 1 - Age and comorbidities
+
+mod1_string = " model {
+    for (i in 1:length(hospitalized_14_days)) {
+        hospitalized_14_days[i] ~ dbern(p[i])
+        
+        logit(p[i]) = int + b[4]*age[i] + b[5]*fever_flg[i] + b[6]*cough_flg[i] + b[7]*sob_flg[i] + b[8]*body_aches_flg[i] + b[9]*runny_nose_flg[i] + b[10]*decr_smell_flg[i] + b[11]*sore_throat_flg[i] + b[12]*diarrhea_flg[i] + b[13]*diabetes[i] + b[14]*hypertension[i] + b[15]*myocardial_infarction[i] + b[16]*cardiac_arrhythmia[i] + b[17]*chronic_pulmonary[i] + b[18]*renal_disease[i] + b[19]*chf[i] + b[20]*liver_disease[i] + b[21]*metastatic_carcinoma[i] + b[22]*obesity[i] + b[23]*aids_hiv[i] + b[24]*transplant_flag[i] + b[25]*immunosupp[i] + b[26]*cerebrovascular[i] + b[27]*neuro_disorders[i]
+    }
+    int ~ dnorm(0.0, 1.0/25.0)
+    for (j in 4:27) {
+        b[j] ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+    }
+} "
+
+
+
+data_jags = list(
+    hospitalized_14_days = train$hospitalized_14_days,
+    age = train$age,
+    # sex_male = train$sex_male,
+    # race_white = train$race_white,
+    # ethnicity = train$ethnicity,
+    fever_flg = train$fever_flg,
+    cough_flg = train$cough_flg,
+    sob_flg = train$sob_flg,
+    body_aches_flg = train$body_aches_flg,
+    runny_nose_flg = train$runny_nose_flg,
+    decr_smell_flg = train$decr_smell_flg,
+    sore_throat_flg = train$sore_throat_flg,
+    diarrhea_flg = train$diarrhea_flg,
+    diabetes = train$diabetes,
+    hypertension = train$hypertension,
+    myocardial_infarction = train$myocardial_infarction,
+    cardiac_arrhythmia = train$cardiac_arrhythmia,
+    chronic_pulmonary = train$chronic_pulmonary,
+    renal_disease = train$renal_disease,
+    chf = train$chf,
+    liver_disease = train$liver_disease,
+    metastatic_carcinoma = train$metastatic_carcinoma,
+    obesity = train$obesity,
+    aids_hiv = train$aids_hiv,
+    transplant_flag = train$transplant_flag,
+    immunosupp = train$immunosupp,
+    cerebrovascular = train$cerebrovascular,
+    neuro_disorders = train$neuro_disorders
+)
+
+
+params = c("int", "b")
+
+mod1 = jags.model(textConnection(mod1_string), data=data_jags, n.chains=3)
+update(mod1, 1e3)
+
+mod1_sim = coda.samples(model=mod1,
+                        variable.names=params,
+                        n.iter=5e3)
+mod1_csim = as.mcmc(do.call(rbind, mod1_sim))
+
+## convergence diagnostics
+
+## calculate DIC
+dic1 = dic.samples(mod1, n.iter=1e3)
+
+
+# 
+# 
+# #Model 2 - With Age_2 (No race or ethnicity, no sex)
+# 
+# mod2_string = " model {
+#     for (i in 1:length(hospitalized_14_days)) {
+#         hospitalized_14_days[i] ~ dbern(p[i])
+#         
+#         logit(p[i]) = int + b[3]*age_2[i] + b[4]*age[i] + b[5]*fever_flg[i] + b[6]*cough_flg[i] + b[7]*sob_flg[i] + b[8]*body_aches_flg[i] + b[9]*runny_nose_flg[i] + b[10]*decr_smell_flg[i] + b[11]*sore_throat_flg[i] + b[12]*diarrhea_flg[i] + b[13]*diabetes[i] + b[14]*hypertension[i] + b[15]*myocardial_infarction[i] + b[16]*cardiac_arrhythmia[i] + b[17]*chronic_pulmonary[i] + b[18]*renal_disease[i] + b[19]*chf[i] + b[20]*liver_disease[i] + b[21]*metastatic_carcinoma[i] + b[22]*obesity[i] + b[23]*aids_hiv[i] + b[24]*transplant_flag[i] + b[25]*immunosupp[i] + b[26]*cerebrovascular[i] + b[27]*neuro_disorders[i]
+#     }
+#     int ~ dnorm(0.0, 1.0/25.0)
+#     for (j in 3:27) {
+#         b[j] ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+#     }
+# } "
+# 
+# 
+# 
+# data_jags2 = list(
+#     hospitalized_14_days = train$hospitalized_14_days,
+#     age = train$age,
+#     age_2 = train$age^2,
+#     # sex_male = train$sex_male,
+#     # race_white = train$race_white,
+#     # ethnicity = train$ethnicity,
+#     fever_flg = train$fever_flg,
+#     cough_flg = train$cough_flg,
+#     sob_flg = train$sob_flg,
+#     body_aches_flg = train$body_aches_flg,
+#     runny_nose_flg = train$runny_nose_flg,
+#     decr_smell_flg = train$decr_smell_flg,
+#     sore_throat_flg = train$sore_throat_flg,
+#     diarrhea_flg = train$diarrhea_flg,
+#     diabetes = train$diabetes,
+#     hypertension = train$hypertension,
+#     myocardial_infarction = train$myocardial_infarction,
+#     cardiac_arrhythmia = train$cardiac_arrhythmia,
+#     chronic_pulmonary = train$chronic_pulmonary,
+#     renal_disease = train$renal_disease,
+#     chf = train$chf,
+#     liver_disease = train$liver_disease,
+#     metastatic_carcinoma = train$metastatic_carcinoma,
+#     obesity = train$obesity,
+#     aids_hiv = train$aids_hiv,
+#     transplant_flag = train$transplant_flag,
+#     immunosupp = train$immunosupp,
+#     cerebrovascular = train$cerebrovascular,
+#     neuro_disorders = train$neuro_disorders
+# )
+# 
+# 
+# params = c("int", "b")
+# 
+# mod2 = jags.model(textConnection(mod2_string), data=data_jags2, n.chains=3)
+# update(mod2, 1e3)
+# 
+# mod2_sim = coda.samples(model=mod2,
+#                         variable.names=params,
+#                         n.iter=5e3)
+# mod2_csim = as.mcmc(do.call(rbind, mod2_sim))
+# 
+# 
+# ## calculate DIC
+# dic2 = dic.samples(mod2, n.iter=1e3)
+# 
+# 
+# 
+# 
+# #MODEL 3 - With Age_2 and Male
+# 
+# mod3_string = " model {
+#     for (i in 1:length(hospitalized_14_days)) {
+#         hospitalized_14_days[i] ~ dbern(p[i])
+#         
+#         logit(p[i]) = int + b[2]*sex_male[i] + b[3]*age_2[i] + b[4]*age[i] + b[5]*fever_flg[i] + b[6]*cough_flg[i] + b[7]*sob_flg[i] + b[8]*body_aches_flg[i] + b[9]*runny_nose_flg[i] + b[10]*decr_smell_flg[i] + b[11]*sore_throat_flg[i] + b[12]*diarrhea_flg[i] + b[13]*diabetes[i] + b[14]*hypertension[i] + b[15]*myocardial_infarction[i] + b[16]*cardiac_arrhythmia[i] + b[17]*chronic_pulmonary[i] + b[18]*renal_disease[i] + b[19]*chf[i] + b[20]*liver_disease[i] + b[21]*metastatic_carcinoma[i] + b[22]*obesity[i] + b[23]*aids_hiv[i] + b[24]*transplant_flag[i] + b[25]*immunosupp[i] + b[26]*cerebrovascular[i] + b[27]*neuro_disorders[i]
+#     }
+#     int ~ dnorm(0.0, 1.0/25.0)
+#     for (j in 2:27) {
+#         b[j] ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+#     }
+# } "
+# 
+# 
+# 
+# data_jags3 = list(
+#     hospitalized_14_days = train$hospitalized_14_days,
+#     age = train$age,
+#     age_2 = train$age^2,
+#     sex_male = train$sex_male,
+#     # white_nh = train$white_nh,
+#     # ethnicity = train$ethnicity,
+#     fever_flg = train$fever_flg,
+#     cough_flg = train$cough_flg,
+#     sob_flg = train$sob_flg,
+#     body_aches_flg = train$body_aches_flg,
+#     runny_nose_flg = train$runny_nose_flg,
+#     decr_smell_flg = train$decr_smell_flg,
+#     sore_throat_flg = train$sore_throat_flg,
+#     diarrhea_flg = train$diarrhea_flg,
+#     diabetes = train$diabetes,
+#     hypertension = train$hypertension,
+#     myocardial_infarction = train$myocardial_infarction,
+#     cardiac_arrhythmia = train$cardiac_arrhythmia,
+#     chronic_pulmonary = train$chronic_pulmonary,
+#     renal_disease = train$renal_disease,
+#     chf = train$chf,
+#     liver_disease = train$liver_disease,
+#     metastatic_carcinoma = train$metastatic_carcinoma,
+#     obesity = train$obesity,
+#     aids_hiv = train$aids_hiv,
+#     transplant_flag = train$transplant_flag,
+#     immunosupp = train$immunosupp,
+#     cerebrovascular = train$cerebrovascular,
+#     neuro_disorders = train$neuro_disorders
+# )
+# 
+# 
+# params = c("int", "b")
+# 
+# mod3 = jags.model(textConnection(mod3_string), data=data_jags3, n.chains=3)
+# update(mod3, 1e3)
+# 
+# mod3_sim = coda.samples(model=mod3,
+#                         variable.names=params,
+#                         n.iter=5e3)
+# mod3_csim = as.mcmc(do.call(rbind, mod3_sim))
+# 
+# 
+# ## calculate DIC
+# dic3 = dic.samples(mod3, n.iter=1e3)
+# 
+# #MODEL 3A - simpler Age 
+# 
+# ### Now with Male Sex but ONLY LINEAR AGE ###
+# 
+# mod3a_string = " model {
+#     for (i in 1:length(hospitalized_14_days)) {
+#         hospitalized_14_days[i] ~ dbern(p[i])
+#         
+#         logit(p[i]) = int + b[3]*sex_male[i] + b[4]*age_2[i] + b[5]*fever_flg[i] + b[6]*cough_flg[i] + b[7]*sob_flg[i] + b[8]*body_aches_flg[i] + b[9]*runny_nose_flg[i] + b[10]*decr_smell_flg[i] + b[11]*sore_throat_flg[i] + b[12]*diarrhea_flg[i] + b[13]*diabetes[i] + b[14]*hypertension[i] + b[15]*myocardial_infarction[i] + b[16]*cardiac_arrhythmia[i] + b[17]*chronic_pulmonary[i] + b[18]*renal_disease[i] + b[19]*chf[i] + b[20]*liver_disease[i] + b[21]*metastatic_carcinoma[i] + b[22]*obesity[i] + b[23]*aids_hiv[i] + b[24]*transplant_flag[i] + b[25]*immunosupp[i] + b[26]*cerebrovascular[i] + b[27]*neuro_disorders[i]
+#     }
+#     int ~ dnorm(0.0, 1.0/25.0)
+#     for (j in 3:27) {
+#         b[j] ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+#     }
+# } "
+# 
+# 
+# 
+# 
+# params = c("int", "b")
+# 
+# mod3a = jags.model(textConnection(mod3a_string), data=data_jags3, n.chains=3)
+# update(mod3a, 1e3)
+# 
+# mod3a_sim = coda.samples(model=mod3a,
+#                         variable.names=params,
+#                         n.iter=5e3)
+# mod3a_csim = as.mcmc(do.call(rbind, mod3a_sim))
+# 
+# 
+# ## calculate DIC
+# dic3a = dic.samples(mod3a, n.iter=1e3)
+# 
+# 
+# 
+# #MODEL 4
+# 
+# ### Now with White Non-Hispanic ###
+# 
+# mod4_string = " model {
+#     for (i in 1:length(hospitalized_14_days)) {
+#         hospitalized_14_days[i] ~ dbern(p[i])
+# 
+#         logit(p[i]) = int + b[1]*white_nh[i] + b[2]*sex_male[i] + b[3]*age_2[i] + b[4]*age[i] + b[5]*fever_flg[i] + b[6]*cough_flg[i] + b[7]*sob_flg[i] + b[8]*body_aches_flg[i] + b[9]*runny_nose_flg[i] + b[10]*decr_smell_flg[i] + b[11]*sore_throat_flg[i] + b[12]*diarrhea_flg[i] + b[13]*diabetes[i] + b[14]*hypertension[i] + b[15]*myocardial_infarction[i] + b[16]*cardiac_arrhythmia[i] + b[17]*chronic_pulmonary[i] + b[18]*renal_disease[i] + b[19]*chf[i] + b[20]*liver_disease[i] + b[21]*metastatic_carcinoma[i] + b[22]*obesity[i] + b[23]*aids_hiv[i] + b[24]*transplant_flag[i] + b[25]*immunosupp[i] + b[26]*cerebrovascular[i] + b[27]*neuro_disorders[i]
+#     }
+#     int ~ dnorm(0.0, 1.0/25.0)
+#     for (j in 1:27) {
+#         b[j] ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+#     }
+# } "
+# 
+# 
+# 
+# data_jags4 = list(
+#     hospitalized_14_days = train$hospitalized_14_days,
+#     age = train$age,
+#     age_2 = train$age^2,
+#     sex_male = train$sex_male,
+#     white_nh = train$white_nh,
+#     # ethnicity = train$ethnicity,
+#     fever_flg = train$fever_flg,
+#     cough_flg = train$cough_flg,
+#     sob_flg = train$sob_flg,
+#     body_aches_flg = train$body_aches_flg,
+#     runny_nose_flg = train$runny_nose_flg,
+#     decr_smell_flg = train$decr_smell_flg,
+#     sore_throat_flg = train$sore_throat_flg,
+#     diarrhea_flg = train$diarrhea_flg,
+#     diabetes = train$diabetes,
+#     hypertension = train$hypertension,
+#     myocardial_infarction = train$myocardial_infarction,
+#     cardiac_arrhythmia = train$cardiac_arrhythmia,
+#     chronic_pulmonary = train$chronic_pulmonary,
+#     renal_disease = train$renal_disease,
+#     chf = train$chf,
+#     liver_disease = train$liver_disease,
+#     metastatic_carcinoma = train$metastatic_carcinoma,
+#     obesity = train$obesity,
+#     aids_hiv = train$aids_hiv,
+#     transplant_flag = train$transplant_flag,
+#     immunosupp = train$immunosupp,
+#     cerebrovascular = train$cerebrovascular,
+#     neuro_disorders = train$neuro_disorders
+# )
+# 
+# 
+# params = c("int", "b")
+# 
+# mod4 = jags.model(textConnection(mod4_string), data=data_jags4, n.chains=3)
+# update(mod4, 1e3)
+# 
+# mod4_sim = coda.samples(model=mod4,
+#                         variable.names=params,
+#                         n.iter=5e3)
+# mod4_csim = as.mcmc(do.call(rbind, mod4_sim))
+# 
+# 
+# 
+# ## calculate DIC
+# dic4 = dic.samples(mod4, n.iter=1e3)
+# 
+# 
+# 
+# #MODEL 5
+# 
+# ### Now with communities of color, linear Age ###
+# 
+# mod5_string = " model {
+#     for (i in 1:length(hospitalized_14_days)) {
+#         hospitalized_14_days[i] ~ dbern(p[i])
+#         
+#         logit(p[i]) = int + b[2]*coc[i] + b[3]*sex_male[i] + b[4]*age[i] + b[5]*fever_flg[i] + b[6]*cough_flg[i] + b[7]*sob_flg[i] + b[8]*body_aches_flg[i] + b[9]*runny_nose_flg[i] + b[10]*decr_smell_flg[i] + b[11]*sore_throat_flg[i] + b[12]*diarrhea_flg[i] + b[13]*diabetes[i] + b[14]*hypertension[i] + b[15]*myocardial_infarction[i] + b[16]*cardiac_arrhythmia[i] + b[17]*chronic_pulmonary[i] + b[18]*renal_disease[i] + b[19]*chf[i] + b[20]*liver_disease[i] + b[21]*metastatic_carcinoma[i] + b[22]*obesity[i] + b[23]*aids_hiv[i] + b[24]*transplant_flag[i] + b[25]*immunosupp[i] + b[26]*cerebrovascular[i] + b[27]*neuro_disorders[i]
+#     }
+#     int ~ dnorm(0.0, 1.0/25.0)
+#     for (j in 2:27) {
+#         b[j] ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+#     }
+# } "
+# 
+# 
+# 
+# data_jags5 = list(
+#     hospitalized_14_days = train$hospitalized_14_days,
+#     age = train$age,
+#     # age_2 = train$age^2,
+#     sex_male = train$sex_male,
+#     # white_nh = train$white_nh,
+#     coc = train$coc,
+#     fever_flg = train$fever_flg,
+#     cough_flg = train$cough_flg,
+#     sob_flg = train$sob_flg,
+#     body_aches_flg = train$body_aches_flg,
+#     runny_nose_flg = train$runny_nose_flg,
+#     decr_smell_flg = train$decr_smell_flg,
+#     sore_throat_flg = train$sore_throat_flg,
+#     diarrhea_flg = train$diarrhea_flg,
+#     diabetes = train$diabetes,
+#     hypertension = train$hypertension,
+#     myocardial_infarction = train$myocardial_infarction,
+#     cardiac_arrhythmia = train$cardiac_arrhythmia,
+#     chronic_pulmonary = train$chronic_pulmonary,
+#     renal_disease = train$renal_disease,
+#     chf = train$chf,
+#     liver_disease = train$liver_disease,
+#     metastatic_carcinoma = train$metastatic_carcinoma,
+#     obesity = train$obesity,
+#     aids_hiv = train$aids_hiv,
+#     transplant_flag = train$transplant_flag,
+#     immunosupp = train$immunosupp,
+#     cerebrovascular = train$cerebrovascular,
+#     neuro_disorders = train$neuro_disorders
+# )
+# 
+# 
+# params = c("int", "b")
+# 
+# mod5 = jags.model(textConnection(mod5_string), data=data_jags5, n.chains=3)
+# update(mod5, 1e3)
+# 
+# mod5_sim = coda.samples(model=mod5,
+#                         variable.names=params,
+#                         n.iter=5e3)
+# mod5_csim = as.mcmc(do.call(rbind, mod5_sim))
+# 
+# 
+# ## calculate DIC
+# dic5 = dic.samples(mod5, n.iter=1e3)
+# 
+# 
+# #MODEL 6 - Paper model with age2
+# 
+# ### Now with communities of color ###
+# 
+# mod6_string = " model {
+#     for (i in 1:length(hospitalized_14_days)) {
+#         hospitalized_14_days[i] ~ dbern(p[i])
+#         
+#         logit(p[i]) = int + b[1]*age_2[i] + b[2]*coc[i] + b[3]*sex_male[i] + b[4]*age[i] + b[5]*fever_flg[i] + b[6]*cough_flg[i] + b[7]*sob_flg[i] + b[8]*body_aches_flg[i] + b[9]*runny_nose_flg[i] + b[10]*decr_smell_flg[i] + b[11]*sore_throat_flg[i] + b[12]*diarrhea_flg[i] + b[13]*diabetes[i] + b[14]*hypertension[i] + b[15]*myocardial_infarction[i] + b[16]*cardiac_arrhythmia[i] + b[17]*chronic_pulmonary[i] + b[18]*renal_disease[i] + b[19]*chf[i] + b[20]*liver_disease[i] + b[21]*metastatic_carcinoma[i] + b[22]*obesity[i] + b[23]*aids_hiv[i] + b[24]*transplant_flag[i] + b[25]*immunosupp[i] + b[26]*cerebrovascular[i] + b[27]*neuro_disorders[i]
+#     }
+#     int ~ dnorm(0.0, 1.0/25.0)
+#     for (j in 1:27) {
+#         b[j] ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+#     }
+# } "
+# 
+# 
+# 
+# data_jags6 = list(
+#     hospitalized_14_days = train$hospitalized_14_days,
+#     age = train$age,
+#     age_2 = train$age^2,
+#     sex_male = train$sex_male,
+#     # white_nh = train$white_nh,
+#     coc = train$coc,
+#     fever_flg = train$fever_flg,
+#     cough_flg = train$cough_flg,
+#     sob_flg = train$sob_flg,
+#     body_aches_flg = train$body_aches_flg,
+#     runny_nose_flg = train$runny_nose_flg,
+#     decr_smell_flg = train$decr_smell_flg,
+#     sore_throat_flg = train$sore_throat_flg,
+#     diarrhea_flg = train$diarrhea_flg,
+#     diabetes = train$diabetes,
+#     hypertension = train$hypertension,
+#     myocardial_infarction = train$myocardial_infarction,
+#     cardiac_arrhythmia = train$cardiac_arrhythmia,
+#     chronic_pulmonary = train$chronic_pulmonary,
+#     renal_disease = train$renal_disease,
+#     chf = train$chf,
+#     liver_disease = train$liver_disease,
+#     metastatic_carcinoma = train$metastatic_carcinoma,
+#     obesity = train$obesity,
+#     aids_hiv = train$aids_hiv,
+#     transplant_flag = train$transplant_flag,
+#     immunosupp = train$immunosupp,
+#     cerebrovascular = train$cerebrovascular,
+#     neuro_disorders = train$neuro_disorders
+# )
+# 
+# 
+# params = c("int", "b")
+# 
+# mod6 = jags.model(textConnection(mod6_string), data=data_jags6, n.chains=3)
+# update(mod6, 1e3)
+# 
+# mod6_sim = coda.samples(model=mod6,
+#                         variable.names=params,
+#                         n.iter=5e3)
+# mod6_csim = as.mcmc(do.call(rbind, mod6_sim))
+# 
+# ## calculate DIC
+# dic6 = dic.samples(mod6, n.iter=1e3)
+# # dic6
+# # summary(mod6_sim)
+# # 
+# # densplot(mod6_csim[,1:27], xlim=c(-3.0, 3.0))
+# # 
+# # 
+# # dic1
+# # dic2
+# # dic3
+# # dic3a
+# # dic5
+# # dic6
+# 
+# 
+# 
+# #MODEL 7 - Interaction with age
+# 
+# mod7_string = " model {
+#     for (i in 1:length(hospitalized_14_days)) {
+#         hospitalized_14_days[i] ~ dbern(p[i])
+#         
+#         logit(p[i]) = int + b[3]*sex_male[i] + b[4]*age[i]*(b[5]*fever_flg[i] + b[6]*cough_flg[i] + b[7]*sob_flg[i] + b[8]*body_aches_flg[i] + b[9]*runny_nose_flg[i] + b[10]*decr_smell_flg[i] + b[11]*sore_throat_flg[i] + b[12]*diarrhea_flg[i] + b[13]*diabetes[i] + b[14]*hypertension[i] + b[15]*myocardial_infarction[i] + b[16]*cardiac_arrhythmia[i] + b[17]*chronic_pulmonary[i] + b[18]*renal_disease[i] + b[19]*chf[i] + b[20]*liver_disease[i] + b[21]*metastatic_carcinoma[i] + b[22]*obesity[i] + b[23]*aids_hiv[i] + b[24]*transplant_flag[i] + b[25]*immunosupp[i] + b[26]*cerebrovascular[i] + b[27]*neuro_disorders[i])
+#     }
+#     int ~ dnorm(0.0, 1.0/25.0)
+#     for (j in 3:27) {
+#         b[j] ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+#     }
+# } "
+# 
+# 
+# 
+# data_jags7 = list(
+#     hospitalized_14_days = train$hospitalized_14_days,
+#     age = train$age,
+#     age_2 = train$age^2,
+#     sex_male = train$sex_male,
+#     # white_nh = train$white_nh,
+#     coc = train$coc,
+#     fever_flg = train$fever_flg,
+#     cough_flg = train$cough_flg,
+#     sob_flg = train$sob_flg,
+#     body_aches_flg = train$body_aches_flg,
+#     runny_nose_flg = train$runny_nose_flg,
+#     decr_smell_flg = train$decr_smell_flg,
+#     sore_throat_flg = train$sore_throat_flg,
+#     diarrhea_flg = train$diarrhea_flg,
+#     diabetes = train$diabetes,
+#     hypertension = train$hypertension,
+#     myocardial_infarction = train$myocardial_infarction,
+#     cardiac_arrhythmia = train$cardiac_arrhythmia,
+#     chronic_pulmonary = train$chronic_pulmonary,
+#     renal_disease = train$renal_disease,
+#     chf = train$chf,
+#     liver_disease = train$liver_disease,
+#     metastatic_carcinoma = train$metastatic_carcinoma,
+#     obesity = train$obesity,
+#     aids_hiv = train$aids_hiv,
+#     transplant_flag = train$transplant_flag,
+#     immunosupp = train$immunosupp,
+#     cerebrovascular = train$cerebrovascular,
+#     neuro_disorders = train$neuro_disorders
+# )
+# 
+# 
+# params = c("int", "b")
+# 
+# mod7 = jags.model(textConnection(mod7_string), data=data_jags7, n.chains=3)
+# update(mod7, 1e3)
+# 
+# mod7_sim = coda.samples(model=mod7,
+#                         variable.names=params,
+#                         n.iter=5e3)
+# mod7_csim = as.mcmc(do.call(rbind, mod7_sim))
+# 
+# 
+# ## calculate DIC
+# dic7 = dic.samples(mod7, n.iter=1e3)
+
+
+#MODEL 8 - Interaction with age
+
+mod8_string = " model {
+    for (i in 1:length(hospitalized_14_days)) {
+        hospitalized_14_days[i] ~ dbern(p[i])
+        
+        logit(p[i]) = int + b[3]*sex_male[i] + b[4]*age[i] + b[5]*fever_flg[i] + b[6]*cough_flg[i] + b[7]*sob_flg[i] + b[8]*body_aches_flg[i] + b[9]*runny_nose_flg[i] + b[10]*decr_smell_flg[i] + b[11]*sore_throat_flg[i] + b[12]*diarrhea_flg[i] + b[13]*diabetes[i] + b[14]*hypertension[i] + b[15]*myocardial_infarction[i] + b[16]*cardiac_arrhythmia[i] + b[17]*chronic_pulmonary[i] + b[18]*renal_disease[i] + b[19]*chf[i] + b[20]*liver_disease[i] + b[21]*metastatic_carcinoma[i] + b[22]*obesity[i] + b[23]*aids_hiv[i] + b[24]*transplant_flag[i] + b[25]*immunosupp[i] + b[26]*cerebrovascular[i] + b[27]*neuro_disorders[i] + b[28]*race_white[i] + b[29]*race_asian[i] + b[30]*race_black_or_african_american[i] + b[31]*race_native_hawaiian_or_pacific_islander[i]+b[32]*ethnicity_hispanic_latino_or_spanish_origin[i]
+    }
+    int ~ dnorm(0.0, 1.0/25.0)
+    for (j in 3:32) {
+        b[j] ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+    }
+} "
+
+
+
+data_jags8 = list(
+    hospitalized_14_days = train$hospitalized_14_days,
+    age = train$age,
+    age_2 = train$age^2,
+    sex_male = train$sex_male,
+    # white_nh = train$white_nh,
+    coc = train$coc,
+    fever_flg = train$fever_flg,
+    cough_flg = train$cough_flg,
+    sob_flg = train$sob_flg,
+    body_aches_flg = train$body_aches_flg,
+    runny_nose_flg = train$runny_nose_flg,
+    decr_smell_flg = train$decr_smell_flg,
+    sore_throat_flg = train$sore_throat_flg,
+    diarrhea_flg = train$diarrhea_flg,
+    diabetes = train$diabetes,
+    hypertension = train$hypertension,
+    myocardial_infarction = train$myocardial_infarction,
+    cardiac_arrhythmia = train$cardiac_arrhythmia,
+    chronic_pulmonary = train$chronic_pulmonary,
+    renal_disease = train$renal_disease,
+    chf = train$chf,
+    liver_disease = train$liver_disease,
+    metastatic_carcinoma = train$metastatic_carcinoma,
+    obesity = train$obesity,
+    aids_hiv = train$aids_hiv,
+    transplant_flag = train$transplant_flag,
+    immunosupp = train$immunosupp,
+    cerebrovascular = train$cerebrovascular,
+    neuro_disorders = train$neuro_disorders,
+    race_white = train$race_white,
+    race_asian = train$race_asian,
+    race_black_or_african_american = train$race_black_or_african_american,
+    race_native_hawaiian_or_pacific_islander = train$race_native_hawaiian_or_pacific_islander,
+    ethnicity_hispanic_latino_or_spanish_origin = train$ethnicity_hispanic_latino_or_spanish_origin
+)
+
+
+params = c("int", "b")
+
+mod8 = jags.model(textConnection(mod8_string), data=data_jags8, n.chains=3)
+update(mod8, 1e3)
+
+mod8_sim = coda.samples(model=mod8,
+                        variable.names=params,
+                        n.iter=5e3)
+mod8_csim = as.mcmc(do.call(rbind, mod8_sim))
+
+## calculate DIC
+dic8 = dic.samples(mod8, n.iter=1e3)
+
+
+# #MODEL 9 - Interaction with age
+# 
+# mod9_string = " model {
+#     for (i in 1:length(hospitalized_14_days)) {
+#         hospitalized_14_days[i] ~ dbern(p[i])
+#         
+#         logit(p[i]) = int + b*age[i] 
+#     }
+#     int ~ dnorm(0.0, 1.0/25.0)
+#     b ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+# } "
+# 
+# 
+# 
+# data_jags9 = list(
+#     hospitalized_14_days = train$hospitalized_14_days,
+#     age = train$age
+#     # age_2 = train$age^2,
+#     # sex_male = train$sex_male,
+#     # white_nh = train$white_nh,
+#     # coc = train$coc,
+#     # fever_flg = train$fever_flg,
+#     # cough_flg = train$cough_flg,
+#     # sob_flg = train$sob_flg,
+#     # body_aches_flg = train$body_aches_flg,
+#     # runny_nose_flg = train$runny_nose_flg,
+#     # decr_smell_flg = train$decr_smell_flg,
+#     # sore_throat_flg = train$sore_throat_flg,
+#     # diarrhea_flg = train$diarrhea_flg,
+#     # diabetes = train$diabetes,
+#     # hypertension = train$hypertension,
+#     # myocardial_infarction = train$myocardial_infarction,
+#     # cardiac_arrhythmia = train$cardiac_arrhythmia,
+#     # chronic_pulmonary = train$chronic_pulmonary,
+#     # renal_disease = train$renal_disease,
+#     # chf = train$chf,
+#     # liver_disease = train$liver_disease,
+#     # metastatic_carcinoma = train$metastatic_carcinoma,
+#     # obesity = train$obesity,
+#     # aids_hiv = train$aids_hiv,
+#     # transplant_flag = train$transplant_flag,
+#     # immunosupp = train$immunosupp,
+#     # cerebrovascular = train$cerebrovascular,
+#     # neuro_disorders = train$neuro_disorders,
+#     # race_white = train$race_white,
+#     # race_asian = train$race_asian,
+#     # race_black_or_african_american = train$race_black_or_african_american,
+#     # race_native_hawaiian_or_pacific_islander = train$race_native_hawaiian_or_pacific_islander,
+#     # ethnicity_hispanic_latino_or_spanish_origin = train$ethnicity_hispanic_latino_or_spanish_origin
+# )
+# 
+# 
+# params = c("int", "b")
+# 
+# mod9 = jags.model(textConnection(mod9_string), data=data_jags9, n.chains=3)
+# update(mod9, 1e3)
+# 
+# mod9_sim = coda.samples(model=mod9,
+#                         variable.names=params,
+#                         n.iter=5e3)
+# mod9_csim = as.mcmc(do.call(rbind, mod9_sim))
+# 
+# ## calculate DIC
+# dic9 = dic.samples(mod9, n.iter=1e3)
+
+
+
+#MODEL 10 - Exact model from paper
+
+mod10_string = " model {
+    for (i in 1:length(hospitalized_14_days)) {
+        hospitalized_14_days[i] ~ dbern(p[i])
+        
+        logit(p[i]) = int + b[1]*coc[i] + b[2]*sex_male[i] + b[3]*age[i] + b[4]*sob_flg[i] + b[5]*diabetes[i] + b[6]*hypertension[i] + b[7]*myocardial_infarction[i] + b[8]*cardiac_arrhythmia[i] + b[9]*chronic_pulmonary[i] + b[10]*renal_disease[i] + b[11]*chf[i] + b[12]*liver_disease[i] + b[13]*obesity[i] + b[14]*immunosupp[i] + b[15]*cerebrovascular[i] + b[16]*neuro_disorders[i]
+    }
+    int ~ dnorm(0.0, 1.0/25.0)
+    for (j in 1:16) {
+        b[j] ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+    }
+} "
+
+data_jags10 = list(
+    hospitalized_14_days = train$hospitalized_14_days,
+    age = train$age,
+    # age_2 = train$age^2,
+    sex_male = train$sex_male,
+    # white_nh = train$white_nh,
+    coc = train$coc,
+    # fever_flg = train$fever_flg,
+    # cough_flg = train$cough_flg,
+    sob_flg = train$sob_flg,
+    # body_aches_flg = train$body_aches_flg,
+    # runny_nose_flg = train$runny_nose_flg,
+    # decr_smell_flg = train$decr_smell_flg,
+    # sore_throat_flg = train$sore_throat_flg,
+    # diarrhea_flg = train$diarrhea_flg,
+    diabetes = train$diabetes,
+    hypertension = train$hypertension,
+    myocardial_infarction = train$myocardial_infarction,
+    cardiac_arrhythmia = train$cardiac_arrhythmia,
+    chronic_pulmonary = train$chronic_pulmonary,
+    renal_disease = train$renal_disease,
+    chf = train$chf,
+    liver_disease = train$liver_disease,
+    # metastatic_carcinoma = train$metastatic_carcinoma,
+    obesity = train$obesity,
+    # aids_hiv = train$aids_hiv,
+    # transplant_flag = train$transplant_flag,
+    immunosupp = train$immunosupp,
+    cerebrovascular = train$cerebrovascular,
+    neuro_disorders = train$neuro_disorders
+    # race_white = train$race_white,
+    # race_asian = train$race_asian,
+    # race_black_or_african_american = train$race_black_or_african_american,
+    # race_native_hawaiian_or_pacific_islander = train$race_native_hawaiian_or_pacific_islander,
+    # ethnicity_hispanic_latino_or_spanish_origin = train$ethnicity_hispanic_latino_or_spanish_origin
+)
+
+
+params = c("int", "b")
+
+mod10 = jags.model(textConnection(mod10_string), data=data_jags10, n.chains=3)
+update(mod10, 1e3)
+
+mod10_sim = coda.samples(model=mod10,
+                        variable.names=params,
+                        n.iter=5e3)
+mod10_csim = as.mcmc(do.call(rbind, mod10_sim))
+
+## calculate DIC
+dic10 = dic.samples(mod10, n.iter=1e3)
+
+
+#MODEL 11 - xxxxxxxx
+
+mod11_string = " model {
+    for (i in 1:length(hospitalized_14_days)) {
+        hospitalized_14_days[i] ~ dbern(p[i])
+        
+        logit(p[i]) = int + b[1]*sex_male[i] + b[2]*age[i] + b[3]*fever_flg[i] + b[4]*sob_flg[i] + b[5]*body_aches_flg[i] + b[6]*runny_nose_flg[i] + b[7]*decr_smell_flg[i] + b[8]*sore_throat_flg[i] + b[9]*diabetes[i] + b[10]*hypertension[i] + b[11]*chf[i] + b[12]*obesity[i] + b[13]*transplant_flag[i] + b[14]*neuro_disorders[i] + b[15]*race_american_indian_or_alaska_native[i] + b[16]*race_asian[i] + b[17]*race_black_or_african_american[i] + b[18]*race_native_hawaiian_or_pacific_islander[i]+b[19]*ethnicity_hispanic_latino_or_spanish_origin[i]
+    }
+    int ~ dnorm(0.0, 1.0/25.0)
+    for (j in 1:19) {
+        b[j] ~ ddexp(0.0, sqrt(2.0)) # has variance 1.0
+    }
+} "
+
+data$race_black_or_african_american
+
+data_jags11 = list(
+    hospitalized_14_days = train$hospitalized_14_days,
+    age = train$age,
+    age_2 = train$age^2,
+    sex_male = train$sex_male,
+    coc = train$coc,
+    fever_flg = train$fever_flg,
+    cough_flg = train$cough_flg,
+    sob_flg = train$sob_flg,
+    body_aches_flg = train$body_aches_flg,
+    runny_nose_flg = train$runny_nose_flg,
+    decr_smell_flg = train$decr_smell_flg,
+    sore_throat_flg = train$sore_throat_flg,
+    diarrhea_flg = train$diarrhea_flg,
+    diabetes = train$diabetes,
+    hypertension = train$hypertension,
+    myocardial_infarction = train$myocardial_infarction,
+    cardiac_arrhythmia = train$cardiac_arrhythmia,
+    chronic_pulmonary = train$chronic_pulmonary,
+    renal_disease = train$renal_disease,
+    chf = train$chf,
+    liver_disease = train$liver_disease,
+    metastatic_carcinoma = train$metastatic_carcinoma,
+    obesity = train$obesity,
+    aids_hiv = train$aids_hiv,
+    transplant_flag = train$transplant_flag,
+    immunosupp = train$immunosupp,
+    cerebrovascular = train$cerebrovascular,
+    neuro_disorders = train$neuro_disorders,
+    race_american_indian_or_alaska_native = train$race_american_indian_or_alaska_native,
+    race_asian = train$race_asian,
+    race_black_or_african_american = train$race_black_or_african_american,
+    race_native_hawaiian_or_pacific_islander = train$race_native_hawaiian_or_pacific_islander,
+    ethnicity_hispanic_latino_or_spanish_origin = train$ethnicity_hispanic_latino_or_spanish_origin
+)
+
+
+params = c("int", "b")
+
+mod11 = jags.model(textConnection(mod11_string), data=data_jags11, n.chains=3)
+update(mod11, 1e3)
+
+mod11_sim = coda.samples(model=mod11,
+                        variable.names=params,
+                        n.iter=5e3)
+mod11_csim = as.mcmc(do.call(rbind, mod11_sim))
+
+## calculate DIC
+dic11 = dic.samples(mod11, n.iter=1e3)
+
+```
+
+Let's look at the summary for Model 11 (not looking at everything else this paper would be too long...):
+
+```{r}
+#| label: model-1-summary
+#| echo: false
+summary(mod11_sim)
+gelman.diag(mod11_sim)
+autocorr.diag(mod11_sim)
+effectiveSize(mod11_sim)
+```
+
+Now let's look at the convergence of model 11 : it appears that the model has sufficiently mixed (I leave out all the other convergence plots for other models since this would be far too long).
+
+```{r}
+#| label: convergence-plots
+#| echo: false
+
+par(mar = c(1, 1, 1, 1))
+plot(mod11_sim)
+# effectiveSize(mod1_sim) %>% as.data.frame()
+# sum_1<-summary(mod1_sim)
+# sum_1$quantiles["b[4]","50%"]
+
+
+```
+
+```{r}
+#| label: select-coefficients
+#| warning: false
+#| echo: false
+mod1_csim %>%
+        as_tibble() %>%
+        mutate(`b[4]` = `b[4]`*10) %>% 
+        pivot_longer(everything(), names_to = "Coefficient") %>%
+        filter(Coefficient != "int") %>%
+        mutate(Coefficient = as.factor(Coefficient)) %>% 
+        mutate(logodds = exp(value)) %>% 
+        mutate(Variable=
+                recode_factor(Coefficient,
+                        "b[4]" = "age (decade)"  ,
+                        "b[5]" = "fever_flg"  ,
+                        "b[6]" = "cough_flg"  ,
+                        "b[7]" = "sob_flg" ,
+                        "b[8]" = "body_aches_flg" ,
+                        "b[9]" = "runny_nose_flg"  ,
+                        "b[10]" = "decr_smell_flg"  ,
+                        "b[11]" = "sore_throat_flg"  ,
+                        "b[12]" = "diarrhea_flg"  ,
+                        "b[13]" = "diabetes"  ,
+                        "b[14]" = "hypertension"  ,
+                        "b[15]" = "myocardial_infarction"  ,
+                        "b[16]" = "cardiac_arrhythmia"  ,
+                        "b[17]" = "chronic_pulmonary"  ,
+                        "b[18]" = "renal_disease"  ,
+                        "b[19]" = "chf"  ,
+                        "b[20]" = "liver_disease"  ,
+                        "b[21]" = "metastatic_carcinoma"  ,
+                        "b[22]" = "obesity"  ,
+                        "b[23]" = "aids_hiv"  ,
+                        "b[24]" = "transplant_flag"  ,
+                        "b[25]" = "immunosupp"  ,
+                        "b[26]" = "cerebrovascular"  ,
+                        "b[27]" = "neuro_disorders"
+                )
+        ) %>% 
+ggplot(aes(x = Variable, y = logodds)) +
+        geom_boxplot(outlier.shape = NA) +
+        ylim(0, 5) +
+        geom_hline(yintercept = 1)+
+        coord_flip() +
+        ggtitle("Model 1 Log Odds")
+
+
+
+
+mod8_csim %>%
+        as_tibble() %>%
+        mutate(`b[4]` = `b[4]`*10) %>% 
+        pivot_longer(everything(), names_to = "Coefficient") %>%
+        filter(Coefficient != "int") %>%
+        mutate(Coefficient = as.factor(Coefficient)) %>% 
+        mutate(logodds = exp(value)) %>% 
+        mutate(Variable=
+                recode_factor(Coefficient,
+                        "b[3]" = "sex_male",
+                        "b[4]" = "age (decade)"  ,
+                        "b[5]" = "fever_flg"  ,
+                        "b[6]" = "cough_flg"  ,
+                        "b[7]" = "sob_flg" ,
+                        "b[8]" = "body_aches_flg" ,
+                        "b[9]" = "runny_nose_flg"  ,
+                        "b[10]" = "decr_smell_flg"  ,
+                        "b[11]" = "sore_throat_flg"  ,
+                        "b[12]" = "diarrhea_flg"  ,
+                        "b[13]" = "diabetes"  ,
+                        "b[14]" = "hypertension"  ,
+                        "b[15]" = "myocardial_infarction"  ,
+                        "b[16]" = "cardiac_arrhythmia"  ,
+                        "b[17]" = "chronic_pulmonary"  ,
+                        "b[18]" = "renal_disease"  ,
+                        "b[19]" = "chf"  ,
+                        "b[20]" = "liver_disease"  ,
+                        "b[21]" = "metastatic_carcinoma"  ,
+                        "b[22]" = "obesity"  ,
+                        "b[23]" = "aids_hiv"  ,
+                        "b[24]" = "transplant_flag"  ,
+                        "b[25]" = "immunosupp"  ,
+                        "b[26]" = "cerebrovascular"  ,
+                        "b[27]" = "neuro_disorders",
+                        "b[28]"="race_white" ,
+                        "b[29]"="race_asian" ,
+                        "b[30]"="race_black_or_african_american" ,
+                        "b[31]"="race_native_hawaiian_or_pacific_islander",
+                        "b[32]"="ethnicity_hispanic_latino_or_spanish_origin"
+                )
+        ) %>% 
+ggplot(aes(x = Variable, y = logodds)) +
+        geom_boxplot(outlier.shape = NA) +
+        ylim(0, 5) +
+        geom_hline(yintercept = 1)+
+        coord_flip() +
+        ggtitle("Model 8 Log Odds")
+
+
+paper_vals <-
+        c(2.1,
+          1.3,
+          1.5,
+          3.5,
+          2.2,
+          1.4,
+          .88,
+          1.1,
+          .92,
+          1.1,
+          1.3,
+          1.0,
+          1.9,
+          3.9,
+          1.1,
+          1.8)
+                        
+paper_data <- data.frame(
+        name = c(
+                "CoC",
+                "male",
+                "age (decade)"  ,
+                "sob_flg" ,
+                "diabetes"  ,
+                "hypertension"  ,
+                "myocardial_infarction"  ,
+                "cardiac_arrhythmia"  ,
+                "chronic_pulmonary"  ,
+                "renal_disease"  ,
+                "chf"  ,
+                "liver_disease"  ,
+                "obesity"  ,
+                "immunosupp",
+                "cerebrovascular",
+                "neuro_disorders"
+        ),
+        value = paper_vals
+)
+
+
+mod10_csim %>%
+        as_tibble() %>%
+        mutate(`b[3]` = `b[3]`*10) %>% 
+        pivot_longer(everything(), names_to = "Coefficient") %>%
+        filter(Coefficient != "int") %>%
+        mutate(Coefficient = as.factor(Coefficient)) %>% 
+        mutate(logodds = exp(value)) %>% 
+        mutate(Variable=
+                recode_factor(Coefficient,
+                        "b[1]" = "CoC",
+                        "b[2]" = "male",
+                        "b[3]" = "age (decade)"  ,
+                        "b[4]" = "sob_flg" ,
+                        "b[5]" = "diabetes"  ,
+                        "b[6]" = "hypertension"  ,
+                        "b[7]" = "myocardial_infarction"  ,
+                        "b[8]" = "cardiac_arrhythmia"  ,
+                        "b[9]" = "chronic_pulmonary"  ,
+                        "b[10]" = "renal_disease"  ,
+                        "b[11]" = "chf"  ,
+                        "b[12]" = "liver_disease"  ,
+                        "b[13]" = "obesity"  ,
+                        "b[14]" = "immunosupp",
+                        "b[15]" = "cerebrovascular",
+                        "b[16]" = "neuro_disorders"
+                )
+        ) %>% 
+ggplot(aes(x = Variable, y = logodds)) +
+        geom_boxplot(outlier.shape = NA) +
+        ylim(0, 5) +
+        geom_hline(yintercept = 1)+
+        coord_flip() +
+        ggtitle("PLOS paper replication: Log Odds")+
+        geom_jitter(data=paper_data, aes(x=name,y=value, fill=name), position=position_jitter(0), color="red", size=1.5, pch=20)+
+        theme(legend.position = "none")
+
+
+mod11_csim %>%
+        as_tibble() %>%
+        mutate(`b[2]` = `b[2]`*10) %>% 
+        pivot_longer(everything(), names_to = "Coefficient") %>%
+        filter(Coefficient != "int") %>%
+        mutate(Coefficient = as.factor(Coefficient)) %>% 
+        mutate(logodds = exp(value)) %>% 
+        mutate(Variable=
+                recode_factor(Coefficient,
+                        "b[1]" = "male",
+                        "b[2]" = "age (decade)",
+                        "b[3]" = "fever_flg"  ,
+                        "b[4]" = "sob_flg" ,
+                        "b[5]" = "body_aches_flg"  ,
+                        "b[6]" = "runny_nose_flg"  ,
+                        "b[7]" = "decr_smell_flg"  ,
+                        "b[8]" = "sore_throat_flg"  ,
+                        "b[9]" = "diabetes"  ,
+                        "b[10]" = "hypertension"  ,
+                        "b[11]" = "chf"  ,
+                        "b[12]" = "obesity"  ,
+                        "b[13]" = "transplant_flag"  ,
+                        "b[14]" = "neuro_disorders",
+                        "b[15]" = "race_american_indian_or_alaska_native",
+                        "b[16]" = "race_asian",
+                        "b[17]" = "race_black_or_african_american",
+                        "b[18]" = "race_native_hawaiian_or_pacific_islander",
+                        "b[19]" = "ethnicity_hispanic_latino_or_spanish_origin",
+                )
+        ) %>% 
+ggplot(aes(x = Variable, y = logodds)) +
+        geom_boxplot(outlier.shape = NA) +
+        ylim(0, 5) +
+        geom_hline(yintercept = 1)+
+        coord_flip() +
+        ggtitle("Model 11 Log Odds")
+
+```
+
+The above also plots the coefficients for a select group of models. The plot for Model 10 (the PLOS paper replication plot) shows the boxplot of the coefficients from Model 10 (the replication model) and the ones published in the PLOS paper (shown by red dots). There is one obvious difference: the coefficient on Immunosuppresion is clearly very different. This is possibly due to a footnote in the paper that notes that the paper "\[e\]xcludes patients with metastatic cancer with non-hospitalization goals of care".
+
+**Consequently, this is a largely successful replication of the paper (but for the immunosuppressed coefficient).**
+
+In general, across many specifications, certain comorbidities associated with higher hospitalization: new shortness of breath, diabetes, organ transplant recipient. Age is also a strong predictor of hospitalization.
+
+Also, it is curious that the paper chooses not to include covariates that predict lower hospitalization rates (e.g., runny nose) even though these appear to contain significant information.
+
+Below compares the DIC across the different models that we fit. Oddly enough, the model used in the paper (model 10) is actually **one of the worst performing models according to this metric**. Models 8 and 11, which do not use the "Communities of Color" construct perform better.
+
+```{r}
+#| label: DIC-plot
+#| echo: false
+
+
+d1 <- sum(dic1$deviance) - sum(dic1$penalty)
+# d2 <- sum(dic2$deviance) - sum(dic2$penalty)
+# d3 <- sum(dic3$deviance) - sum(dic3$penalty)
+# d3a <- sum(dic3a$deviance) - sum(dic3a$penalty)
+# d4 <- sum(dic4$deviance) - sum(dic4$penalty)
+# d5 <- sum(dic5$deviance) - sum(dic5$penalty)
+# d6 <- sum(dic6$deviance) - sum(dic6$penalty)
+# d7 <- sum(dic7$deviance) - sum(dic7$penalty)
+d8 <- sum(dic8$deviance) - sum(dic8$penalty)
+# d9 <- sum(dic9$deviance) - sum(dic9$penalty)
+d10 <-sum(dic10$deviance) - sum(dic10$penalty)
+d11 <-sum(dic11$deviance) - sum(dic11$penalty)
+
+# dic_all <- data.frame(cbind(rbind(d1,d2,d3,d3a,d4,d5,d6,d7,d8,d9,d10, d11),c("1","2","3","3a","4","5","6","7","8","9","10","11")))
+
+dic_all <- data.frame(cbind(rbind(d1,d8,d10, d11),c("1","8","10","11")))
+
+
+names(dic_all)<-c("Model DIC", "Model number")
+
+dic_all %>% 
+        mutate(`Model number` = as.factor(`Model number`)) %>% 
+        mutate(`Model DIC` = round(as.numeric(`Model DIC`),0)) %>% 
+        mutate(`Model number` = fct_reorder(`Model number`,`Model DIC`)) %>% 
+        ggplot(aes(x=`Model number`, y=`Model DIC`, fill=`Model number`, label = `Model DIC`))+
+        geom_bar(stat="identity") +
+        ylim(0,7000)+
+        geom_text(size = 3, position = position_stack(vjust = 0.5))+
+        coord_flip()+
+        ggtitle("Model performance: DIC")+
+        theme(legend.position = "none")
+
+```
+
+The in-sample DIC of the model in the paper is not very good when compared to the alternatives.
+
+Now lets see how well each of these models can perform out of sample. Like above, we will only look at models 1 (baseline model), 10 (PLOS model), 8, and 11. Hospitalization for COVID is a very rare event - therefore, predicting that no one goes to the hospital would still give you a very high specificity and NPV. Given the purpose of this model is to allocate scarce medicine to specifically avoid hospitalization, then we likely should care about the PPV (positive predictive value) of the model. Put another way, for any number of patients, what percent of flagged patients will truly end up in the hospital?
+
+```{r}
+#| label: specificity-plot
+#| echo: false
+
+pm1_coef = colMeans(mod1_csim)
+
+
+X = cbind(
+        test$hospitalized_14_days,
+        test$age,
+        test$fever_flg,
+        test$cough_flg,
+        test$sob_flg,
+        test$body_aches_flg,
+        test$runny_nose_flg,
+        test$decr_smell_flg,
+        test$sore_throat_flg,
+        test$diarrhea_flg,
+        test$diabetes,
+        test$hypertension,
+        test$myocardial_infarction,
+        test$cardiac_arrhythmia,
+        test$chronic_pulmonary,
+        test$renal_disease,
+        test$chf,
+        test$liver_disease,
+        test$metastatic_carcinoma,
+        test$obesity,
+        test$aids_hiv,
+        test$transplant_flag,
+        test$immunosupp,
+        test$cerebrovascular,
+        test$neuro_disorders
+)
+
+
+pm_Xb = pm1_coef["int"] + X[,2:25] %*% pm1_coef[1:24]
+test$phat = 1.0 / (1.0 + exp(-pm_Xb))
+# head(phat)
+
+# test %>% 
+#         ggplot(aes(x=phat, y=jitter(hospitalized_14_days)))+
+#         geom_point()+
+#         geom_smooth(method="loess")+
+#         ggtitle("Model 1")
+
+
+
+PPV_list <- tibble()
+for (i in 1:70) {
+        (tab = table(test$phat > i / 100, test$hospitalized_14_days))
+        PPV_list[i,"cutoff"]<- i/100
+        PPV_list[i,"accuracy"] <- sum(diag(tab)) / sum(tab)
+        PPV_list[i,"specificity"] <- tab["TRUE","1"]/sum(tab["TRUE",])
+        PPV_list[i,"sensitivity"] <- tab["FALSE","0"]/sum(tab[,"0"])
+        PPV_list[i,"precision"] <- tab["TRUE","1"]/sum(tab[,"1"])
+        PPV_list[i,"npv"] <-tab["FALSE","0"]/sum(tab["FALSE",])
+}
+
+
+# PPV_list 
+PPV_list %>% pivot_longer(cols= !cutoff, names_to = "metric") %>% 
+        ggplot(aes(x=cutoff, y=value, group = metric,color=metric)) +
+        geom_line()+
+        ylim(0.0, 1.0)+
+        ggtitle("Model 1 out of sample performance")
+
+# PPV_list %>% ggplot(aes(x=specificity, y=sensitivity)) +
+#         geom_point()+
+#         ylim(0.0, 1.0)+
+#         xlim(0.0,1.0)+
+#         geom_abline(intercept = 0, slope = 1)+
+#         ggtitle("Model 1 ROC")
+
+#MODEL 10
+
+# Model 10
+
+pm10_coef = colMeans(mod10_csim)
+
+X = cbind(
+        test$hospitalized_14_days,
+        test$coc,
+        test$sex_male,
+        test$age,
+        test$sob_flg,
+        test$diabetes,
+        test$hypertension,
+        test$myocardial_infarction,
+        test$cardiac_arrhythmia,
+        test$chronic_pulmonary,
+        test$renal_disease,
+        test$chf,
+        test$liver_disease,
+        test$obesity,
+        test$immunosupp,
+        test$cerebrovascular,
+        test$neuro_disorders
+)
+
+
+pm_Xb = pm10_coef["int"] + X[,2:17] %*% pm10_coef[1:16]
+test$phat_10 = 1.0 / (1.0 + exp(-pm_Xb))
+# head(test$phat_10)
+
+# test %>% 
+#         ggplot(aes(x=phat_10, y=jitter(hospitalized_14_days)))+
+#         geom_point()+
+#         geom_smooth(method="loess")+
+#         ggtitle("Model 10")
+
+
+
+PPV_list <- tibble()
+for (i in 1:70) {
+        (tab = table(test$phat_10 > i / 100, test$hospitalized_14_days))
+        PPV_list[i,"cutoff"]<- i/100
+        PPV_list[i,"accuracy"] <- sum(diag(tab)) / sum(tab)
+        PPV_list[i,"specificity"] <- tab["TRUE","1"]/sum(tab["TRUE",])
+        PPV_list[i,"sensitivity"] <- tab["FALSE","0"]/sum(tab[,"0"])
+        PPV_list[i,"precision"] <- tab["TRUE","1"]/sum(tab[,"1"])
+        PPV_list[i,"npv"] <-tab["FALSE","0"]/sum(tab["FALSE",])
+}
+
+
+# PPV_list 
+PPV_list %>% pivot_longer(cols= !cutoff, names_to = "metric") %>% 
+        ggplot(aes(x=cutoff, y=value, group = metric,color=metric)) +
+        geom_line()+
+        ylim(0.0, 1.0)+
+        ggtitle("Model 10 (PLOS model) out of sample performance")
+
+# PPV_list %>% ggplot(aes(x=specificity, y=sensitivity)) +
+#         geom_point()+
+#         ylim(0.0, 1.0)+
+#         xlim(0.0,1.0)+
+#         geom_abline(intercept = 0, slope = 1)+
+#         ggtitle("Model 10 (PLOS) ROC")
+
+
+# Model 11
+
+pm11_coef = colMeans(mod11_csim)
+
+
+X = cbind(
+        test$hospitalized_14_days,
+        test$sex_male,
+        test$age,
+        test$fever_flg,
+        test$sob_flg,
+        test$body_aches_flg,
+        test$runny_nose_flg,
+        test$decr_smell_flg,
+        test$sore_throat_flg,
+        test$diabetes,
+        test$hypertension,
+        test$chf,
+        test$obesity,
+        test$transplant_flag,
+        test$neuro_disorders,
+        test$race_american_indian_or_alaska_native,
+        test$race_asian,
+        test$race_black_or_african_american,
+        test$race_native_hawaiian_or_pacific_islander,
+        test$ethnicity_hispanic_latino_or_spanish_origin
+)
+
+
+pm_Xb = pm11_coef["int"] + X[,2:20] %*% pm11_coef[1:19]
+test$phat_11 = 1.0 / (1.0 + exp(-pm_Xb))
+# head(test$phat_11)
+
+# test %>% 
+#         ggplot(aes(x=phat_11, y=jitter(hospitalized_14_days)))+
+#         geom_point()+
+#         geom_smooth(method="loess")+
+#         ggtitle("Model 11")
+
+
+PPV_list <- tibble()
+for (i in 1:70) {
+        (tab = table(test$phat_11 > i / 100, test$hospitalized_14_days))
+        PPV_list[i,"cutoff"]<- i/100
+        PPV_list[i,"accuracy"] <- sum(diag(tab)) / sum(tab)
+        PPV_list[i,"specificity"] <- tab["TRUE","1"]/sum(tab["TRUE",])
+        PPV_list[i,"sensitivity"] <- tab["FALSE","0"]/sum(tab[,"0"])
+        PPV_list[i,"precision"] <- tab["TRUE","1"]/sum(tab[,"1"])
+        PPV_list[i,"npv"] <-tab["FALSE","0"]/sum(tab["FALSE",])
+}
+
+
+# PPV_list 
+PPV_list %>% pivot_longer(cols= !cutoff, names_to = "metric") %>% 
+        ggplot(aes(x=cutoff, y=value, group = metric,color=metric)) +
+        geom_line()+
+        ylim(0.0, 1.0)+
+        ggtitle("Model 11 out of sample performance")
+
+# PPV_list %>% ggplot(aes(x=specificity, y=sensitivity)) +
+#         geom_point()+
+#         ylim(0.0, 1.0)+
+#         xlim(0.0,1.0)+
+#         geom_abline(intercept = 0, slope = 1)+
+#         ggtitle("Model 11 ROC")
+
+
+# Risk score
+
+# max(data$risk_score)
+
+PPV_list <- tibble()
+for (i in 1:15) {
+        (tab = table(test$risk_score > i, test$hospitalized_14_days))
+        PPV_list[i,"cutoff"]<- i
+        PPV_list[i,"accuracy"] <- sum(diag(tab)) / sum(tab)
+        PPV_list[i,"specificity"] <- tab["TRUE","1"]/sum(tab["TRUE",])
+        PPV_list[i,"sensitivity"] <- tab["FALSE","0"]/sum(tab[,"0"])
+        PPV_list[i,"precision"] <- tab["TRUE","1"]/sum(tab[,"1"])
+        PPV_list[i,"npv"] <-tab["FALSE","0"]/sum(tab["FALSE",])
+}
+
+
+# PPV_list 
+PPV_list %>% pivot_longer(cols= !cutoff, names_to = "metric") %>% 
+        ggplot(aes(x=cutoff, y=value, group = metric,color=metric)) +
+        geom_line()+
+        ylim(0.0, 1.0)+
+        ggtitle("Risk Score total sample performance")
+
+
+# PPV_list %>% ggplot(aes(x=specificity, y=sensitivity)) +
+#         geom_point()+
+#         ylim(0.0, 1.0)+
+#         xlim(0.0,1.0)+
+#         geom_abline(intercept = 0, slope = 1)+
+#         ggtitle("Risk score ROC")
+
+
+```
+
+## Results
+
+In short, the paper does not **strictly** replicate. This is because the immunocompromised coefficient in the paper does not match what was run in this my model.
