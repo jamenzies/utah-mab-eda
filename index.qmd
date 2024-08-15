@@ -3,22 +3,26 @@ title: "Replication of Utah MaB study"
 execute: 
   echo: false
 ---
-In 2022, Tucker Carlson, a popular cable news host, highlighted a controversial COVID-19 policy in Utah:
+Is it fair to deny someone medical treatment because of their race?
 
-"In Utah, COVID patients are triaged by a scoring system [for antibody treatments]...]. [R]ace often counts more than physical health. The State of Utah, for example, gives two points simply for not being white [while] congestive heart failure earns one point."
+During the COVID-19 pandemic, the Utah Department of Health decided to triage a scarce (but effective) treatment for COVID by giving patients a "risk score".  In a decision many civil rights lawyers flagged as illegal, they allocated additional points to patients based on their race.
 
-The Utah Department of Health faced criticism for their race-based triage system, which prioritized non-White patients for monoclonal antibodies.
+This garnered national media attention and many lawyers noted that this was illegal.
 
-I obtained the underlying data to determine if UDOH's results replicate.
-
-
+The below uses the data that UDOH claimed justified the policy. It shows clearly that the risk of COVID-19 hospitalization increases greatly with age (across all comorbidities).  Although there are differences between non-White and White patients, the differences are small compared to the effect of age.  
 
 ```{r}
 #| label: setup
 #| message: false
 
+library(Hmisc)
+library(binom)
+library(gridExtra)
+library(grid)
+library(ggpubr)
 library(tidyverse)
 library(janitor)
+library(tidyr)
 
 ```
 
@@ -37,7 +41,7 @@ df <- df |>
   clean_names()
 
 
-df <- df %>%
+df <- df |>
   mutate(
     sex = as.factor(sex),
     race = as.factor(race),
@@ -45,7 +49,7 @@ df <- df %>%
   )
 
 
-df <- df %>% 
+df <- df |> 
         filter(sex == "Female" | sex == "Male") 
 
 df$race <- ifelse(is.na(df$race), "Unknown", as.character(df$race))
@@ -60,7 +64,7 @@ df <- cbind(df,model.matrix(~ ethnicity - 1, data = df))
 
 
 
-df <- df %>%
+df <- df |>
   clean_names()
 
 df$white_nh <- ifelse(df$race == "White" & df$ethnicity == "Not Hispanic, Latino, or Spanish Origin", 1, 0)
@@ -68,73 +72,128 @@ df$white_nh <- ifelse(df$race == "White" & df$ethnicity == "Not Hispanic, Latino
 df$coc <- ifelse(df$race_black_or_african_american == 1 | df$race_asian ==1 | df$race_american_indian_or_alaska_native == 1 | df$race_multiple == 1 | df$race_native_hawaiian_or_pacific_islander == 1 | df$ethnicity_hispanic_latino_or_spanish_origin == 1, 1, 0)
 
 
-df <- df %>%
+df <- df |>
   clean_names()
 
 
 
 ```
 
-
 ```{r}
-df %>% 
-        count(age, race, obesity) %>% 
-        group_by(age, race) %>% 
-        filter(race != "Multiple") %>% 
-        mutate(freq = n / sum(n)) %>% 
-        mutate(race = as.factor(race)) %>% 
-        filter(obesity == 1) %>% 
-        ggplot(aes(x=age,y=freq, color = race)) +
-        geom_point(alpha = .2) +
-        geom_smooth(method = "loess", formula = "y ~ x", se = FALSE) +
-        ggtitle("Obesity rates by race (excluding Multiple) and age")
+#| warning: false
+df <- df |>
+  mutate(across(-c(random, charlson, x28_d_mortality, hospitalized_14_days, age), as.factor))
+
+
+comorb <- c(
+  "sex_male",
+  "fever_flg",             
+  "cough_flg",             
+  "sob_flg",               
+  "body_aches_flg",       
+  "runny_nose_flg",        
+  "decr_smell_flg",        
+  "sore_throat_flg",       
+  "diarrhea_flg",         
+  "diabetes",              
+  "hypertension",          
+  # "myocardial_infarction", 
+  "cardiac_arrhythmia",   
+  "chronic_pulmonary",     
+  "renal_disease",         
+  "chf",                   
+  "liver_disease",        
+  # "metastatic_carcinoma",  
+  "obesity",               
+#  "transplant_flag",      
+  # "immunosupp",            
+  "cerebrovascular",       
+  "neuro_disorders",
+  "no_comorb"
+)
+
+
+# Define a named vector for the facet labels
+facet_labels <- c(
+  sex_male = "Sex (Male)",
+  fever_flg = "Fever",
+  cough_flg = "Cough",
+  sob_flg = "Shortness of Breath",
+  body_aches_flg = "Body Aches",
+  runny_nose_flg = "Runny Nose",
+  decr_smell_flg = "Decreased Smell",
+  sore_throat_flg = "Sore Throat",
+  diarrhea_flg = "Diarrhea",
+  diabetes = "Diabetes",
+  hypertension = "Hypertension",
+  cardiac_arrhythmia = "Cardiac Arrhythmia",
+  chronic_pulmonary = "Chronic Pulmonary",
+  renal_disease = "Renal Disease",
+  chf = "CHF",
+  liver_disease = "Liver Disease",
+  obesity = "Obesity",
+  immunosupp = "Immunosuppression",
+  cerebrovascular = "Cerebrovascular",
+  neuro_disorders = "Neuro Disorders",
+  no_comorb = "No Comorbidity"
+)
+
+# Update the ggplot code
+df %>%
+  mutate(no_comorb = if_all(
+    c(
+      "diabetes",
+      "hypertension",
+      "cardiac_arrhythmia",
+      "chronic_pulmonary",
+      "renal_disease",
+      "chf",
+      "liver_disease",
+      "obesity",
+      "immunosupp",
+      "cerebrovascular",
+      "neuro_disorders"
+    ),
+    ~ . == 0,
+    .names = "no_comorb"
+  )) %>%
+  mutate(no_comorb = as.integer(no_comorb)) %>%
+  mutate(no_comorb = as_factor(no_comorb)) %>%
+  pivot_longer(
+    cols = any_of(comorb),
+    names_to = "comorbidity",
+    values_to = "value"
+  ) %>%
+  filter(value == 1) %>%
+  select(hospitalized_14_days, age, comorbidity, coc) %>%
+  drop_na() %>%
+  ggplot(aes(x = age, y = hospitalized_14_days, color = coc)) +
+  geom_point(alpha = 0.01) +
+  geom_smooth(method = "loess", formula = y ~ x, se = TRUE) +
+  facet_wrap(~ comorbidity, labeller = as_labeller(facet_labels)) +
+  theme_minimal() +
+  labs(
+    title = "Hospitalization rates by comorbidity, age, and race",
+    x = "Age",
+    y = "Hospitalized (14 Days)",
+    color = "Race"
+  ) +
+  # scale_color_viridis_d(
+  #   option = "rocket",
+  #   direction = -1,
+  #   labels = c("White non-Hispanic", "Not White")
+  # ) +
+  scale_y_continuous(
+    limits = c(0, 1),
+    breaks = c(0, 1),
+    labels = scales::percent
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "horizontal"
+  )
+
+
+
+
 ```
-
-```{r}
-
-# 
-# # data %>% 
-# #         count(age, coc, x28_d_mortality) %>% 
-# #         group_by(age, coc) %>% 
-# #         mutate(freq = n / sum(n)) %>% 
-# #         mutate(coc = as.factor(coc)) %>% 
-# #         filter(x28_d_mortality == 1) %>% 
-# #         ggplot(aes(x=age,y=freq, color = coc)) +
-# #         geom_point() +
-# #         geom_smooth(method = "loess") +
-# #         ggtitle("Death is quite rare")
-# 
-# # create an empty list to store the plots
-# plot_list2 <- list()
-# 
-# data$sex_male<-as.factor(data$sex_male)
-# # loop through each variable and create the plot
-# for (var in vars_to_plot) {
-#   p <- data %>%
-#     count(!!sym(var), age, hospitalized_14_days, .drop = FALSE) %>%
-#     group_by(!!sym(var), age) %>%
-#     mutate(freq = n / sum(n)) %>% 
-#     filter(hospitalized_14_days == 1) %>% 
-#     ggplot(aes(x=age,y=freq, color = !!sym(var))) +
-#         geom_point(size = .1) +
-#         geom_smooth(method = "loess")+
-#         ggtitle(var)+
-#         ylim(0,1)+
-#         theme(text = element_text(size = 6), axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(), panel.spacing = unit(0.1, "lines"), legend.position = "none")
-#   # add the plot to the list
-#   plot_list2[[var]] <- p
-# }
-# data$sex_male<-as.numeric(data$sex_male)
-# # create the facet wrap plot
-# 
-# ggarrange(plotlist = plot_list2, ncol=6, nrow = 4, common.legend = TRUE, legend="bottom") %>% 
-# annotate_figure(., top = textGrob("Hospitalization rates by comorbidity and age"))
-```
-
-
-
-
-
-
-
-

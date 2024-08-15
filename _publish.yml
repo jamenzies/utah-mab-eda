@@ -1,0 +1,4 @@
+- source: project
+  quarto-pub:
+    - id: a934dcaf-6056-46fc-b86e-890972f9c9c0
+      url: 'https://jmenzies.quarto.pub/utah-mab-replication'
